@@ -1,22 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --page-bg: 246 248 252;
+  --page-fg: 15 23 42;
+  --panel-bg: 255 255 255;
+  --border: 226 232 240;
+  --text: 15 23 42;
+  --text-subtle: 51 65 85;
+  --text-muted: 71 85 105;
+  --text-faint: 100 116 139;
+  --glass-tint: 2 6 23;
+  --panel-strong: 0.92;
+  --panel: 0.85;
+  --panel-soft: 0.65;
+  --section: 0.55;
+  --border-strong: 0.55;
+  --border-soft: 0.35;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html[data-theme="dark"] {
+  --page-bg: 2 6 23;
+  --page-fg: 226 232 240;
+  --panel-bg: 15 23 42;
+  --border: 51 65 85;
+  --text: 226 232 240;
+  --text-subtle: 203 213 225;
+  --text-muted: 148 163 184;
+  --text-faint: 100 116 139;
+  --glass-tint: 255 255 255;
+  --panel-strong: 0.82;
+  --panel: 0.62;
+  --panel-soft: 0.45;
+  --section: 0.28;
+  --border-strong: 0.45;
+  --border-soft: 0.25;
 }
 
 html {
@@ -35,8 +57,8 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: rgb(var(--page-bg));
+  color: rgb(var(--page-fg));
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }

@@ -1,17 +1,32 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { PROJECTS } from "../data/projects";
+import { PROJECTS, getProjectText } from "../data/projects";
+import { useI18n } from "../components/I18nProvider";
+import { useTheme } from "../components/ThemeProvider";
+import { SiteNavbar } from "../components/SiteNavbar";
+import { SiteFooter } from "../components/SiteFooter";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_E164,
+  EDUCATION,
+  EXPERIENCES,
+  FLOATING_SKILLS,
+  SKILLS,
+  SOCIAL_LINKS,
+  WHATSAPP_DEFAULT_TEXT,
+  WHATSAPP_PHONE,
+} from "../lib/home.constants";
+import { mapContactApiErrors, type ContactFormErrors, type ContactFormValues, validateContactForm } from "../lib/contactForm";
 import {
   Github,
   Linkedin,
   Mail,
   Phone,
   MapPin,
-  Youtube,
-  Facebook,
   Briefcase,
   GraduationCap,
   Award,
@@ -28,187 +43,12 @@ import {
   Download,
   Send,
   ChevronUp,
+  Loader2,
+  CircleCheck,
+  TriangleAlert,
+  MessageCircle,
 } from "lucide-react";
 
-type NavItem = { id: string; name: string };
-type Experience = {
-  title: string;
-  company: string;
-  location: string;
-  period: string;
-  duration: string;
-  projects: number;
-};
-type Education = {
-  title: string;
-  school: string;
-  period: string;
-  details: string | string[];
-};
-
-const NAV_ITEMS: NavItem[] = [
-  { name: "Accueil", id: "accueil" },
-  { name: "À propos", id: "apropos" },
-  { name: "Projets", id: "projets" },
-  { name: "Compétences", id: "competences" },
-  { name: "Contact", id: "contact" },
-];
-
-const SOCIAL_LINKS = [
-  { icon: Github, href: "https://github.com/Kadjio-sonna", label: "GitHub" },
-  { icon: Linkedin, href: "https://linkedin.com/in/Brundone-Kadjio", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:devkadjio@gmail.com", label: "Email" },
-  // { icon: Youtube, href: "https://youtube.com/@kadjiologuetube9403", label: "YouTube" },
-  // { icon: Facebook, href: "https://facebook.com/Brundone-Officíel-New", label: "Facebook" },
-] as const;
-
-const SKILLS = {
-  backend: [
-    "Node.js (Express, EJS)",
-    "Python (FastAPI)",
-    "Java (Spring Boot, Spring Cloud)",
-    "API REST & Microservices",
-    "Sécurité (OAuth2/JWT, Keycloak)",
-    "Messaging (Kafka)",
-  ],
-  frontend: ["React.js (Redux)", "Next.js", "Vue.js", "Nuxt.js", "Angular", "Tailwind CSS"],
-  mobile: ["Flutter (Provider)", "Ionic", "React Native"],
-  database: ["PostgreSQL", "MongoDB", "MySQL", "Firestore", "DynamoDB", "DocumentDB"],
-  tools: [
-    "Docker & Docker Compose",
-    "GitHub / GitLab",
-    "CI/CD (GitLab CI)",
-    "AWS (S3, ECS, SQS)",
-    "Firebase (Cloud Functions)",
-    "Maven",
-    "Figma",
-    "SCRUM/Agile",
-    "Jira / Trello",
-  ],
-} as const;
-
-const EXPERIENCES: Experience[] = [
-  {
-    title: "Développeur Full-Stack (Web et Mobile)",
-    company: "CODEZYS",
-    location: "Paris, France (Télétravail)",
-    period: "Sept 2022 - Présent",
-    duration: "3+ ans",
-    projects: 4,
-  },
-  {
-    title: "Développeur Web & Mobile",
-    company: "SMARTCODE Group",
-    location: "Douala, Cameroun",
-    period: "Nov 2021 - Mai 2022",
-    duration: "6 mois",
-    projects: 3,
-  },
-  {
-    title: "Développeur Web Full-Stack",
-    company: "NOBISOFT",
-    location: "Douala, Cameroun",
-    period: "Sept 2021 - Oct 2021",
-    duration: "1 mois",
-    projects: 1,
-  },
-];
-
-const EDUCATION: Education[] = [
-  {
-    title: "Concepteur de système d’information (CSI) — CS2I3 DWM",
-    school: "Programme 3IL Groupe — IUC (Institut Universitaire de la Côte), Douala, LT, Cameroun",
-    period: "Nov 2020 - Août 2021 • Mention Bien",
-    details: [
-      "Projets scolaires de création d'applications web et mobile",
-      "Notes élevées dans les matières de programmation",
-      "Langages/enseignements: Angular, Ionic, Tailwind, gestion de projet, veille technologique, gestion d’entreprise, droit informatique",
-    ],
-  },
-  {
-    title: "Brevet de Technicien Supérieur (BTS) — Génie Logiciel",
-    school: "IUC (Institut Universitaire de la Côte), Douala, LT, Cameroun",
-    period: "Sept 2018 - Août 2020 • Mention Bien",
-    details: [
-      "Projets scolaires de développement de logiciels",
-      "Notes élevées dans les matières de programmation",
-      "Langages/enseignements: VB.NET, POO, HTML5, CSS3, PHP 7",
-    ],
-  },
-  {
-    title: "Baccalauréat Scientifique (BAC D)",
-    school: "Collège du Levant, Bonabéri, LT, Cameroun",
-    period: "Sept 2015 - Juil 2016",
-    details: "Série D",
-  },
-];
-
-type FloatingSkill = {
-  name: "Java (Spring boot)" | "React" | "Flutter" | "Node.js" | "Python";
-  logoSrc: string;
-  accentClassName: string;
-  positionClassName: string;
-  floatAxis: "x" | "y";
-  floatValues: number[];
-  duration: number;
-  delay: number;
-};
-
-// Badges de compétences qui flottent autour de la photo (effet visuel "premium").
-// Les logos sont chargés via Simple Icons (SVG). Si vous souhaitez 0 dépendance réseau,
-// on pourra les mettre dans /public et remplacer ces URLs.
-const FLOATING_SKILLS: FloatingSkill[] = [
-  {
-    name: "React",
-    logoSrc: "https://cdn.simpleicons.org/react/61DAFB",
-    accentClassName: "ring-1 ring-cyan-400/25 shadow-cyan-500/10",
-    positionClassName: "-top-6 left-2",
-    floatAxis: "y",
-    floatValues: [0, -10, 0],
-    duration: 3.2,
-    delay: 0,
-  },
-  {
-    name: "Java (Spring boot)",
-    logoSrc: "https://cdn.simpleicons.org/openjdk/FFFFFF",
-    accentClassName: "ring-1 ring-amber-400/25 shadow-amber-500/10",
-    positionClassName: "-top-8 right-0",
-    floatAxis: "y",
-    floatValues: [0, -12, 0],
-    duration: 3.6,
-    delay: 0.4,
-  },
-  {
-    name: "Flutter",
-    logoSrc: "https://cdn.simpleicons.org/flutter/54C5F8",
-    accentClassName: "ring-1 ring-sky-400/25 shadow-sky-500/10",
-    positionClassName: "top-1/3 -left-10",
-    floatAxis: "x",
-    floatValues: [0, 10, 0],
-    duration: 4.2,
-    delay: 0.6,
-  },
-  {
-    name: "Node.js",
-    logoSrc: "https://cdn.simpleicons.org/nodedotjs/22C55E",
-    accentClassName: "ring-1 ring-emerald-400/25 shadow-emerald-500/10",
-    positionClassName: "top-1/2 -right-10",
-    floatAxis: "x",
-    floatValues: [0, -10, 0],
-    duration: 4,
-    delay: 0.2,
-  },
-  {
-    name: "Python",
-    logoSrc: "https://cdn.simpleicons.org/python/FDE047",
-    accentClassName: "ring-1 ring-yellow-300/25 shadow-yellow-400/10",
-    positionClassName: "bottom-10 -left-6",
-    floatAxis: "y",
-    floatValues: [0, 8, 0],
-    duration: 3.8,
-    delay: 0.8,
-  },
-];
 
 function FloatingSkills({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
   return (
@@ -219,7 +59,7 @@ function FloatingSkills({ shouldReduceMotion }: { shouldReduceMotion: boolean })
           key={`${skill.name}-${index}`}
           className={[
             "absolute z-30",
-            "rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 shadow-xl shadow-black/30 backdrop-blur-xl",
+            "rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 shadow-xl shadow-black/20 backdrop-blur-xl",
             skill.accentClassName,
             "hidden sm:block",
             skill.positionClassName,
@@ -238,12 +78,12 @@ function FloatingSkills({ shouldReduceMotion }: { shouldReduceMotion: boolean })
           }}
         >
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5">
+            <span className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))]">
               <img src={skill.logoSrc} alt="" className="h-5 w-5" />
             </span>
             <div className="leading-tight">
-              <div className="text-sm font-semibold text-slate-100">{skill.name}</div>
-              <div className="text-xs text-slate-400">Stack</div>
+              <div className="text-sm font-semibold text-[rgb(var(--text))]">{skill.name}</div>
+              <div className="text-xs text-[rgb(var(--text-muted))]">Stack</div>
             </div>
           </div>
         </motion.div>
@@ -253,9 +93,17 @@ function FloatingSkills({ shouldReduceMotion }: { shouldReduceMotion: boolean })
 }
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState("accueil");
-  const [isScrolled, setIsScrolled] = useState(false);
+  const { locale, messages } = useI18n();
+  const { theme } = useTheme();
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [contactValues, setContactValues] = useState<ContactFormValues>({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [contactErrors, setContactErrors] = useState<ContactFormErrors>({});
+  const [contactStatus, setContactStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const shouldReduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const scrollProgress = useSpring(scrollYProgress, {
@@ -267,7 +115,6 @@ export default function Home() {
   useEffect(() => {
     const handleScroll = () => {
       const y = window.scrollY;
-      setIsScrolled(y > 16);
       setShowBackToTop(y > 700);
     };
 
@@ -277,28 +124,6 @@ export default function Home() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  const sectionIds = useMemo(() => NAV_ITEMS.map((i) => i.id), []);
-
-  useEffect(() => {
-    const sections = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[];
-
-    if (sections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const best = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
-        if (best?.target?.id) setActiveSection(best.target.id);
-      },
-      { root: null, rootMargin: "-45% 0px -50% 0px", threshold: [0.05, 0.2, 0.4, 0.6] },
-    );
-
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
-  }, [sectionIds]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -306,93 +131,69 @@ export default function Home() {
     el.scrollIntoView({ behavior: shouldReduceMotion ? "auto" : "smooth", block: "start" });
   };
 
+  const onContactChange = (field: keyof ContactFormValues) => {
+    return (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      setContactValues((prev) => ({ ...prev, [field]: value }));
+      setContactErrors((prev) => ({ ...prev, [field]: undefined }));
+      setContactStatus("idle");
+    };
+  };
+
+  const submitContactForm = async (e: FormEvent) => {
+    e.preventDefault();
+    const errors = validateContactForm(contactValues, messages);
+    if (Object.keys(errors).length > 0) {
+      setContactErrors(errors);
+      setContactStatus("idle");
+      return;
+    }
+
+    try {
+      setContactStatus("submitting");
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(contactValues),
+      });
+
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { errors?: Record<string, string> } | null;
+        setContactErrors(mapContactApiErrors(body?.errors, messages));
+        setContactStatus("error");
+        return;
+      }
+
+      setContactValues({ name: "", email: "", subject: "", message: "" });
+      setContactErrors({});
+      setContactStatus("success");
+    } catch {
+      setContactStatus("error");
+    }
+  };
+
+  const ambientBackground =
+    theme === "dark"
+      ? "radial-gradient(1200px circle at 20% 10%, rgba(99,102,241,0.18), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(56,189,248,0.12), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(139,92,246,0.12), transparent 55%)"
+      : "radial-gradient(1200px circle at 18% 10%, rgba(16,185,129,0.10), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(220,38,38,0.08), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(250,204,21,0.10), transparent 55%)";
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[rgb(var(--page-bg))] text-[rgb(var(--text))] overflow-x-hidden relative">
       <div
         className="absolute inset-0 -z-10"
         aria-hidden="true"
         style={{
-          background:
-            "radial-gradient(1200px circle at 20% 10%, rgba(99,102,241,0.18), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(56,189,248,0.12), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(139,92,246,0.12), transparent 55%)",
+          background: ambientBackground,
         }}
       />
 
       <motion.div
-        className="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-indigo-400 via-blue-400 to-violet-400"
+        className="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-emerald-600 via-red-600 to-yellow-400"
         style={{ scaleX: scrollProgress }}
         aria-hidden="true"
       />
 
-      <motion.nav
-        className="fixed top-6 inset-x-0 mx-auto w-[95%] max-w-5xl z-50"
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: shouldReduceMotion ? 0 : 0.8, ease: "easeOut" }}
-      >
-        <div className={`
-          flex items-center justify-between px-6 py-3 rounded-full border transition-all duration-500
-          ${isScrolled 
-            ? "bg-slate-900/80 backdrop-blur-xl border-slate-700/50 shadow-2xl shadow-indigo-500/10" 
-            : "bg-slate-900/40 backdrop-blur-md border-white/5"}
-        `}>
-          <motion.a 
-            href="#accueil"
-            className="text-xl font-bold text-slate-100 flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection("accueil");
-            }}
-          >
-            <span className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/20">BK</span>
-            <span className="hidden sm:block font-bold tracking-tight">BK.dev</span>
-          </motion.a>
-
-          <div className="hidden md:flex items-center gap-1 bg-slate-950/30 p-1.5 rounded-full border border-white/5 backdrop-blur-sm">
-            {NAV_ITEMS.slice(0, 4).map((item) => (
-              <motion.a
-                key={item.id}
-                href={`#${item.id}`}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 relative ${
-                  activeSection === item.id 
-                    ? "text-white" 
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(item.id);
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {activeSection === item.id && (
-                  <motion.div
-                    layoutId="activeSection"
-                    className="absolute inset-0 bg-indigo-600 rounded-full shadow-lg shadow-indigo-500/25 -z-10"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                {item.name}
-              </motion.a>
-            ))}
-          </div>
-
-          <motion.a
-            href="#contact"
-            className="px-6 py-2.5 bg-slate-100 text-slate-900 rounded-full text-sm font-bold hover:bg-white transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection("contact");
-            }}
-          >
-            <span className="hidden sm:inline">Me Contacter</span>
-            <span className="sm:hidden">Contact</span>
-            <Send size={16} className="text-indigo-600" />
-          </motion.a>
-        </div>
-      </motion.nav>
+      <SiteNavbar variant="home" />
 
       <section
         id="accueil"
@@ -402,55 +203,52 @@ export default function Home() {
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
 
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
             className="text-left"
           >
-            <motion.div 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-indigo-400 mb-6"
+            <motion.div
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--panel-bg)/var(--panel-soft))] border border-[rgb(var(--border)/var(--border-soft))] text-indigo-600 mb-6"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.2 }}
             >
               <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-              <span className="text-sm font-medium">Disponible pour de nouveaux projets</span>
+              <span className="text-sm font-medium">{messages.hero.available}</span>
             </motion.div>
 
-            <motion.h1 
-              className="text-4xl lg:text-6xl font-bold mb-6 text-slate-100 leading-tight"
+            <motion.h1
+              className="text-4xl lg:text-6xl font-bold mb-6 text-[rgb(var(--text))] leading-tight"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.3 }}
             >
-              Brundone Junior <br />
-              <span className="text-indigo-500">
-                Kadjio Sonna
-              </span>
+              {messages.hero.titleLine1} <br />
+              <span className="text-indigo-500">{messages.hero.titleLine2}</span>
             </motion.h1>
 
-            <motion.p 
-              className="text-xl text-indigo-200 mb-6 font-light"
+            <motion.p
+              className="text-xl text-indigo-600 mb-6 font-light"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.4 }}
             >
-              Développeur Full-Stack Web & Mobile
+              {messages.hero.subtitle}
             </motion.p>
-            
-            <motion.p 
-              className="text-base text-slate-400 max-w-xl mb-8 leading-relaxed"
+
+            <motion.p
+              className="text-base text-[rgb(var(--text-muted))] max-w-xl mb-8 leading-relaxed"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.5 }}
             >
-              Passionné par la création d&apos;applications innovantes avec plus de 4 ans d&apos;expérience. 
-              Je transforme vos idées en solutions digitales performantes.
+              {messages.hero.intro}
             </motion.p>
 
-            <motion.div 
+            <motion.div
               className="flex flex-wrap gap-4 mb-12"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -467,11 +265,11 @@ export default function Home() {
                 }}
               >
                 <Send size={18} />
-                Me Contacter
+                {messages.hero.ctaContact}
               </motion.a>
               <motion.a
                 href="#contact"
-                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all border border-slate-700 text-sm"
+                className="px-6 py-3 bg-[rgb(var(--panel-bg)/var(--panel-soft))] hover:bg-[rgb(var(--panel-bg)/var(--panel))] text-[rgb(var(--text))] rounded-full font-semibold flex items-center gap-2 transition-all border border-[rgb(var(--border)/var(--border-soft))] text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={(e) => {
@@ -480,62 +278,67 @@ export default function Home() {
                 }}
               >
                 <Download size={18} />
-                Demander mon CV
+                {messages.hero.ctaCv}
               </motion.a>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="flex gap-6 items-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.8 }}
             >
-              <span className="text-slate-500 text-sm uppercase tracking-wider font-semibold">Suivez-moi</span>
-              <div className="h-px w-12 bg-slate-700"></div>
+              <span className="text-[rgb(var(--text-faint))] text-sm uppercase tracking-wider font-semibold">
+                {messages.hero.followMe}
+              </span>
+              <div className="h-px w-12 bg-[rgb(var(--border)/0.7)]"></div>
               <div className="flex gap-4">
-                {SOCIAL_LINKS.map((social) => (
-                  <a
-                    key={social.href}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-slate-200 transition hover:border-white/20 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                  >
-                    <social.icon size={20} aria-hidden="true" />
-                  </a>
-                ))}
+                {SOCIAL_LINKS.map((social) => {
+                  const Icon = social.key === "github" ? Github : social.key === "linkedin" ? Linkedin : Mail;
+                  return (
+                    <a
+                      key={social.href}
+                      href={social.href}
+                      target={social.key !== "mail" ? "_blank" : undefined}
+                      rel="noopener noreferrer"
+                      aria-label={social.label}
+                      className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+                    >
+                      <Icon size={20} aria-hidden="true" />
+                    </a>
+                  );
+                })}
               </div>
             </motion.div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="relative lg:h-[500px] flex items-center justify-center"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
           >
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-indigo-600 rounded-[2rem] rotate-3 opacity-20 blur-xl"
               animate={
                 shouldReduceMotion
                   ? undefined
                   : {
-                      rotate: [3, 6, 3],
-                      scale: [1, 1.02, 1],
-                    }
+                    rotate: [3, 6, 3],
+                    scale: [1, 1.02, 1],
+                  }
               }
               transition={{ duration: shouldReduceMotion ? 0 : 5, repeat: shouldReduceMotion ? 0 : Infinity }}
             />
 
-            <div className="relative w-full max-w-sm aspect-[4/5] bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group">
-              <div className="absolute bottom-0 left-0 p-6 z-20 w-full bg-slate-900/90 backdrop-blur-sm border-t border-slate-700">
-                <div className="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-bold mb-2 border border-indigo-500/30">
-                  4+ ANS D&apos;EXPÉRIENCE
+            <div className="relative w-full max-w-sm aspect-[4/5] bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group">
+              <div className="absolute bottom-0 left-0 p-6 z-20 w-full bg-[rgb(var(--panel-bg)/0.92)] backdrop-blur-sm border-t border-[rgb(var(--border)/var(--border-soft))]">
+                <div className="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-700 rounded-full text-xs font-bold mb-2 border border-indigo-500/30">
+                  {messages.hero.experienceBadge}
                 </div>
-                <a 
-                  href="#competences" 
-                  className="group/arrow flex items-center gap-3 cursor-pointer hover:bg-slate-800/50 -mx-2 px-2 py-1 rounded-lg transition-colors"
+                <a
+                  href="#competences"
+                  className="group/arrow flex items-center gap-3 cursor-pointer hover:bg-[rgb(var(--panel-bg)/0.65)] -mx-2 px-2 py-1 rounded-lg transition-colors"
                   onClick={(e) => {
                     e.preventDefault();
                     scrollToSection("competences");
@@ -545,16 +348,18 @@ export default function Home() {
                     <ArrowRight size={16} className="text-indigo-400 group-hover/arrow:text-white transition-colors group-hover/arrow:translate-x-0.5" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-0.5 group-hover/arrow:text-indigo-300 transition-colors">Expert React & Java & Node</h3>
-                    <p className="text-slate-400 text-xs">Prêt à relever de nouveaux défis</p>
+                    <h3 className="text-xl font-bold text-[rgb(var(--text))] mb-0.5 group-hover/arrow:text-indigo-500 transition-colors">
+                      {messages.hero.profileCardTitle}
+                    </h3>
+                    <p className="text-[rgb(var(--text-muted))] text-xs">{messages.hero.profileCardSubtitle}</p>
                   </div>
                 </a>
               </div>
 
-              <Image 
-                src="/images/profil.jpg" 
-                alt="Photo de profil" 
-                fill 
+              <Image
+                src="/images/profil.jpg"
+                alt="Photo de profil"
+                fill
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 priority
               />
@@ -563,20 +368,20 @@ export default function Home() {
             {/* Badges de compétences flottants autour de la photo (effet visuel). */}
             <FloatingSkills shouldReduceMotion={!!shouldReduceMotion} />
           </motion.div>
-          
+
         </div>
       </section>
 
-      <motion.section 
-        id="apropos" 
-        className="py-32 px-6 bg-slate-900/50"
+      <motion.section
+        id="apropos"
+        className="py-32 px-6 bg-[rgb(var(--panel-bg)/var(--section))]"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
         <div className="max-w-6xl mx-auto">
-          <motion.h2 
+          <motion.h2
             className="text-4xl font-bold mb-16 text-center flex items-center justify-center gap-4"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -584,9 +389,9 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <User className="text-indigo-400" size={40} />
-            À Propos de Moi
+            {messages.about.title}
           </motion.h2>
-          
+
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <motion.div
               initial={{ x: -50, opacity: 0 }}
@@ -594,42 +399,34 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-semibold mb-6 text-indigo-300">Mon Parcours</h3>
-              <p className="text-slate-300 leading-relaxed mb-6">
-                Développeur Full-Stack passionné avec plus de 4 ans d&apos;expérience dans la création 
-                d&apos;applications web et mobiles innovantes. Je transforme des idées complexes en 
-                solutions élégantes et performantes.
-              </p>
-              <p className="text-slate-300 leading-relaxed mb-8">
-                Spécialisé dans les technologies modernes comme React, Node.js, et Flutter, 
-                je m&apos;efforce de créer des expériences utilisateur exceptionnelles tout en 
-                maintenant un code propre et maintenable.
-              </p>
-              
+              <h3 className="text-2xl font-semibold mb-6 text-indigo-500">{messages.about.journeyTitle}</h3>
+              <p className="text-[rgb(var(--text-subtle))] leading-relaxed mb-6">{messages.about.journeyP1}</p>
+              <p className="text-[rgb(var(--text-subtle))] leading-relaxed mb-8">{messages.about.journeyP2}</p>
+
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
-                  <div className="text-2xl font-bold text-indigo-400 mb-1">4+</div>
-                  <div className="text-sm text-slate-400">Années d&apos;expérience</div>
+                <div className="bg-[rgb(var(--panel-bg)/var(--panel))] p-4 rounded-lg border border-[rgb(var(--border)/var(--border-soft))]">
+                  <div className="text-2xl font-bold text-indigo-500 mb-1">{messages.about.years}</div>
+                  <div className="text-sm text-[rgb(var(--text-muted))]">{messages.about.yearsLabel}</div>
                 </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                <div className="bg-[rgb(var(--panel-bg)/var(--panel))] p-4 rounded-lg border border-[rgb(var(--border)/var(--border-soft))]">
                   <div className="text-2xl font-bold text-indigo-400 mb-1">{PROJECTS.length}</div>
-                  <div className="text-sm text-slate-400">Projets réalisés</div>
+                  <div className="text-sm text-[rgb(var(--text-muted))]">{messages.about.projectsLabel}</div>
                 </div>
               </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ x: 50, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-semibold mb-6 text-indigo-300">Expérience Professionnelle</h3>
+              <h3 className="text-2xl font-semibold mb-6 text-indigo-500">{messages.about.expTitle}</h3>
               <div className="space-y-6">
                 {EXPERIENCES.map((exp, index) => (
                   <motion.div
                     key={`${exp.company}-${exp.period}`}
-                    className="bg-slate-800/30 p-6 rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-300"
+                    className="bg-[rgb(var(--panel-bg)/var(--panel))] p-6 rounded-lg border border-[rgb(var(--border)/var(--border-soft))] hover:border-indigo-500 transition-all duration-300"
                     whileHover={{ scale: 1.02 }}
                     initial={{ y: 20, opacity: 0 }}
                     whileInView={{ y: 0, opacity: 1 }}
@@ -641,18 +438,18 @@ export default function Home() {
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h4 className="text-lg font-semibold text-indigo-300">{exp.title}</h4>
-                        <p className="text-slate-400 flex items-center gap-2">
+                        <h4 className="text-lg font-semibold text-indigo-500">{exp.title}</h4>
+                        <p className="text-[rgb(var(--text-muted))] flex items-center gap-2">
                           <Building2 size={16} />
                           {exp.company}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-indigo-400 font-medium">{exp.period}</p>
-                        <p className="text-slate-500 text-sm">{exp.duration}</p>
+                        <p className="text-indigo-500 font-medium">{exp.period}</p>
+                        <p className="text-[rgb(var(--text-faint))] text-sm">{exp.duration}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                    <div className="flex items-center gap-2 text-sm text-[rgb(var(--text-muted))]">
                       <MapPin size={14} />
                       {exp.location}
                     </div>
@@ -664,8 +461,8 @@ export default function Home() {
         </div>
       </motion.section>
 
-      <motion.section 
-        id="projets" 
+      <motion.section
+        id="projets"
         className="py-32 px-6"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -673,7 +470,7 @@ export default function Home() {
         viewport={{ once: true }}
       >
         <div className="max-w-7xl mx-auto">
-          <motion.h2 
+          <motion.h2
             className="text-4xl font-bold mb-16 text-center flex items-center justify-center gap-4"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -681,14 +478,14 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <Briefcase className="text-indigo-400" size={40} />
-            Projets Réalisés
+            {messages.projects.title}
           </motion.h2>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {PROJECTS.map((project, index) => (
               <motion.div
-                key={`${project.title}-${project.company}`}
-                className="bg-slate-900/50 rounded-xl p-8 border border-slate-700 hover:border-indigo-500 transition-all duration-300 group"
+                key={project.slug}
+                className="bg-[rgb(var(--panel-bg)/var(--panel))] rounded-xl p-8 border border-[rgb(var(--border)/var(--border-soft))] hover:border-indigo-500 transition-all duration-300 group"
                 initial={{ y: 50, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{
@@ -696,75 +493,75 @@ export default function Home() {
                   delay: shouldReduceMotion ? 0 : index * 0.08,
                 }}
                 viewport={{ once: true }}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.03,
                   boxShadow: "0 20px 40px rgba(99, 102, 241, 0.1)"
                 }}
               >
                 <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-xl font-bold text-indigo-300 group-hover:text-indigo-400 transition-colors">
+                  <h3 className="text-xl font-bold text-indigo-600 group-hover:text-indigo-500 transition-colors">
                     {project.title}
                   </h3>
                   <div className="flex items-center gap-2">
                     {(project.links ?? []).slice(0, 1).map((l) => (
                       <motion.a
-                        key={`${project.title}-${l.label}`}
+                        key={`${project.slug}-${l.href}`}
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`${project.title} - ${l.label}`}
-                        className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                        aria-label={`${project.title} - ${getProjectText(l.label, locale)}`}
+                        className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <span>{l.label}</span>
+                        <span>{getProjectText(l.label, locale)}</span>
                         <ExternalLink size={16} aria-hidden="true" />
                       </motion.a>
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="mb-4">
-                  <p className="text-slate-400 flex items-center gap-2 mb-2">
+                  <p className="text-[rgb(var(--text-muted))] flex items-center gap-2 mb-2">
                     <Building2 size={16} />
-                    {project.company}
+                    {getProjectText(project.company, locale)}
                   </p>
-                  <p className="text-indigo-400 text-sm mb-4">{project.role}</p>
+                  <p className="text-indigo-600 text-sm mb-4">{getProjectText(project.role, locale)}</p>
                 </div>
-                
-                <p className="text-slate-300 mb-6 leading-relaxed">
-                  {project.description}
+
+                <p className="text-[rgb(var(--text-subtle))] mb-6 leading-relaxed">
+                  {getProjectText(project.description, locale)}
                 </p>
-                
+
                 <div className="flex flex-wrap gap-2 mb-6">
                   {project.tech.slice(0, 4).map((tech, i) => (
                     <motion.span
                       key={i}
-                      className="text-xs bg-indigo-900/30 px-3 py-1 rounded-full text-indigo-300 border border-indigo-800/30"
+                      className="text-xs bg-indigo-500/10 px-3 py-1 rounded-full text-indigo-700 border border-indigo-500/20"
                       whileHover={{ scale: 1.05, backgroundColor: "rgba(99, 102, 241, 0.2)" }}
                     >
                       {tech}
                     </motion.span>
                   ))}
                   {project.tech.length > 4 && (
-                    <span className="text-xs bg-slate-700 px-2 py-1 rounded-full text-slate-400">
+                    <span className="text-xs bg-[rgb(var(--panel-bg)/0.75)] px-2 py-1 rounded-full text-[rgb(var(--text-muted))] border border-[rgb(var(--border)/0.35)]">
                       +{project.tech.length - 4}
                     </span>
                   )}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-[rgb(var(--text-muted))]">
                     <Star size={14} className="text-indigo-400" />
-                    <span>Projet vedette</span>
+                    <span>{messages.projects.featured}</span>
                   </div>
                   <Link
                     href={`/projets/${project.slug}`}
                     aria-label={`Voir le projet - ${project.title}`}
-                    className="inline-flex items-center gap-2 text-indigo-400 text-sm font-medium transition hover:text-indigo-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-md"
+                    className="inline-flex items-center gap-2 text-indigo-600 text-sm font-medium transition hover:text-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))] rounded-md"
                   >
                     <motion.span whileHover={{ x: 5 }} className="inline-flex items-center gap-2">
-                      <span>Voir le projet</span>
+                      <span>{messages.projects.viewProject}</span>
                       <ArrowRight size={16} aria-hidden="true" />
                     </motion.span>
                   </Link>
@@ -775,16 +572,16 @@ export default function Home() {
         </div>
       </motion.section>
 
-      <motion.section 
-        id="competences" 
-        className="py-32 px-6 bg-slate-900/50"
+      <motion.section
+        id="competences"
+        className="py-32 px-6 bg-[rgb(var(--panel-bg)/var(--section))]"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
         <div className="max-w-6xl mx-auto">
-          <motion.h2 
+          <motion.h2
             className="text-4xl font-bold mb-16 text-center flex items-center justify-center gap-4"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -792,14 +589,14 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <Award className="text-indigo-400" size={40} />
-            Compétences Techniques
+            {messages.skills.title}
           </motion.h2>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Object.entries(SKILLS).map(([category, items], index) => (
               <motion.div
                 key={category}
-                className="bg-slate-800/30 p-8 rounded-xl border border-slate-700"
+                className="bg-[rgb(var(--panel-bg)/var(--panel))] p-8 rounded-xl border border-[rgb(var(--border)/var(--border-soft))]"
                 initial={{ y: 50, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{
@@ -807,7 +604,7 @@ export default function Home() {
                   delay: shouldReduceMotion ? 0 : index * 0.08,
                 }}
                 viewport={{ once: true }}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.02,
                   borderColor: "rgba(99, 102, 241, 0.5)"
                 }}
@@ -818,21 +615,26 @@ export default function Home() {
                   {category === "mobile" && <Phone className="text-indigo-400" size={24} />}
                   {category === "database" && <Database className="text-indigo-400" size={24} />}
                   {category === "tools" && <Wrench className="text-indigo-400" size={24} />}
-                  
-                  <h3 className="text-xl font-semibold text-indigo-300 capitalize">
-                    {category === "backend" ? "Backend" : 
-                     category === "frontend" ? "Frontend" :
-                     category === "mobile" ? "Mobile" :
-                     category === "database" ? "Base de Données" : "Outils"}
+
+                  <h3 className="text-xl font-semibold text-indigo-600 capitalize">
+                    {category === "backend"
+                      ? messages.skills.backend
+                      : category === "frontend"
+                        ? messages.skills.frontend
+                        : category === "mobile"
+                          ? messages.skills.mobile
+                          : category === "database"
+                            ? messages.skills.database
+                            : messages.skills.tools}
                   </h3>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-2">
                   {items.map((skill) => (
                     <motion.span
                       key={skill}
-                      className="text-sm bg-indigo-900/20 px-3 py-1 rounded-full text-indigo-300 border border-indigo-800/20"
-                      whileHover={{ 
+                      className="text-sm bg-indigo-500/10 px-3 py-1 rounded-full text-indigo-700 border border-indigo-500/20"
+                      whileHover={{
                         scale: 1.05,
                         backgroundColor: "rgba(99, 102, 241, 0.3)",
                         borderColor: "rgba(99, 102, 241, 0.5)"
@@ -846,14 +648,14 @@ export default function Home() {
             ))}
           </div>
 
-          <motion.div 
+          <motion.div
             className="mt-20"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <motion.h3 
+            <motion.h3
               className="text-3xl font-bold mb-12 text-center flex items-center justify-center gap-4"
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -861,33 +663,33 @@ export default function Home() {
               viewport={{ once: true }}
             >
               <GraduationCap className="text-indigo-400" size={32} />
-              Formation
+              {messages.skills.educationTitle}
             </motion.h3>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               {EDUCATION.map((edu, index) => (
                 <motion.div
                   key={edu.title}
-                  className="bg-slate-800/30 p-8 rounded-xl border border-slate-700"
+                  className="bg-[rgb(var(--panel-bg)/var(--panel))] p-8 rounded-xl border border-[rgb(var(--border)/var(--border-soft))]"
                   initial={{ x: index % 2 === 0 ? -50 : 50, opacity: 0 }}
                   whileInView={{ x: 0, opacity: 1 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.02 }}
                 >
-                  <h4 className="text-xl font-semibold text-indigo-300 mb-3">
+                  <h4 className="text-xl font-semibold text-indigo-600 mb-3">
                     {edu.title}
                   </h4>
-                  <p className="text-slate-400 mb-2 flex items-center gap-2">
+                  <p className="text-[rgb(var(--text-muted))] mb-2 flex items-center gap-2">
                     <Building2 size={16} />
                     {edu.school}
                   </p>
-                  <p className="text-sm text-slate-500 mb-4 flex items-center gap-2">
+                  <p className="text-sm text-[rgb(var(--text-faint))] mb-4 flex items-center gap-2">
                     <Clock size={14} />
                     {edu.period}
                   </p>
                   {Array.isArray(edu.details) ? (
-                    <ul className="grid gap-2 text-sm text-slate-300">
+                    <ul className="grid gap-2 text-sm text-[rgb(var(--text-subtle))]">
                       {edu.details.map((d) => (
                         <li key={d} className="flex gap-2">
                           <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400/80" />
@@ -896,7 +698,7 @@ export default function Home() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-slate-300 text-sm leading-relaxed">{edu.details}</p>
+                    <p className="text-[rgb(var(--text-subtle))] text-sm leading-relaxed">{edu.details}</p>
                   )}
                 </motion.div>
               ))}
@@ -905,128 +707,257 @@ export default function Home() {
         </div>
       </motion.section>
 
-      <motion.section 
-        id="contact" 
+      <motion.section
+        id="contact"
         className="py-32 px-6"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h2 
-            className="text-4xl font-bold mb-8"
+        <div className="max-w-6xl mx-auto">
+          <motion.h2
+            className="text-4xl font-bold mb-8 text-center"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Prêt à collaborer ?
+            {messages.contact.title}
           </motion.h2>
-          
-          <motion.p 
-            className="text-xl text-slate-400 mb-16"
+
+          <motion.p
+            className="text-xl text-[rgb(var(--text-muted))] mb-16 text-center"
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            Disponible pour des projets freelance ou opportunités en CDI
+            {messages.contact.subtitle}
           </motion.p>
-          
-          <motion.div 
-            className="bg-slate-900/50 rounded-2xl p-10 border border-slate-700"
-            initial={{ scale: 0.9, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <motion.div 
-                className="flex items-center gap-4 justify-center md:justify-start"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="p-3 bg-indigo-600/20 rounded-full border border-indigo-500/30">
-                  <Mail className="text-indigo-400" size={24} />
-                </div>
-                <div className="text-left">
-                  <p className="text-slate-400 text-sm">Email</p>
-                  <a
-                    href="mailto:devkadjio@gmail.com"
-                    className="text-slate-200 hover:text-indigo-400 transition-colors font-medium"
-                  >
-                    devkadjio@gmail.com
-                  </a>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                className="flex items-center gap-4 justify-center md:justify-start"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="p-3 bg-indigo-600/20 rounded-full border border-indigo-500/30">
-                  <Phone className="text-indigo-400" size={24} />
-                </div>
-                <div className="text-left">
-                  <p className="text-slate-400 text-sm">Téléphone</p>
-                  <a
-                    href="tel:+237652027456"
-                    className="text-slate-200 hover:text-indigo-400 transition-colors font-medium"
-                  >
-                    +237 6 52 02 74 56
-                  </a>
-                </div>
-              </motion.div>
-            </div>
-            
-            <motion.a
-              href="mailto:devkadjio@gmail.com"
-              className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+
+          <div className="grid gap-6">
+            {/*
+            <motion.div
+              className="rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel))] p-10"
+              initial={{ scale: 0.96, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
             >
-              <Mail size={20} />
-              Envoyer un message
-            </motion.a>
-          </motion.div>
+              <div className="mb-8 text-left">
+                <div className="text-sm font-semibold text-[rgb(var(--text))]">{messages.contact.contactQuickTitle}</div>
+                <div className="mt-1 text-sm text-[rgb(var(--text-muted))]">{messages.contact.subtitle}</div>
+              </div>
+
+              <div className="grid gap-6">
+                <motion.div className="flex items-center gap-4" whileHover={{ scale: 1.02 }}>
+                  <div className="p-3 bg-indigo-600/15 rounded-full border border-indigo-500/25">
+                    <Mail className="text-indigo-600" size={22} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[rgb(var(--text-muted))] text-sm">{messages.contact.email}</p>
+                    <a
+                      href="mailto:devkadjio@gmail.com"
+                      className="text-[rgb(var(--text))] hover:text-indigo-600 transition-colors font-medium"
+                    >
+                      devkadjio@gmail.com
+                    </a>
+                  </div>
+                </motion.div>
+
+                <motion.div className="flex items-center gap-4" whileHover={{ scale: 1.02 }}>
+                  <div className="p-3 bg-indigo-600/15 rounded-full border border-indigo-500/25">
+                    <Phone className="text-indigo-600" size={22} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[rgb(var(--text-muted))] text-sm">{messages.contact.phone}</p>
+                    <a
+                      href="tel:+237652027456"
+                      className="text-[rgb(var(--text))] hover:text-indigo-600 transition-colors font-medium"
+                    >
+                      +237 6 52 02 74 56
+                    </a>
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="mt-10 flex justify-start">
+                <motion.a
+                  href="mailto:devkadjio@gmail.com"
+                  className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 px-7 py-3.5 rounded-xl font-semibold text-white transition-all duration-300"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Mail size={18} />
+                  {messages.contact.sendMessage}
+                </motion.a>
+              </div>
+            </motion.div>
+            */}
+
+            <motion.div
+              className="rounded-2xl border border-[rgb(var(--border)/0.45)] bg-[rgb(var(--panel-bg)/0.55)] p-10"
+              initial={{ scale: 0.96, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <div className="mb-8 text-left">
+                <div className="text-sm font-semibold text-[rgb(var(--text))]">{messages.contact.contactFormTitle}</div>
+                <div className="mt-1 text-sm text-[rgb(var(--text-muted))]">{messages.contact.formHint}</div>
+              </div>
+
+              <div className="mb-8 grid gap-3 sm:grid-cols-3">
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                >
+                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600">
+                    <Mail size={18} aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-semibold text-[rgb(var(--text-muted))]">{messages.contact.email}</span>
+                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-indigo-600">
+                      {CONTACT_EMAIL}
+                    </span>
+                  </span>
+                </a>
+
+                <a
+                  href={`tel:${CONTACT_PHONE_E164}`}
+                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                >
+                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600">
+                    <Phone size={18} aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-semibold text-[rgb(var(--text-muted))]">{messages.contact.phone}</span>
+                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-indigo-600">
+                      {CONTACT_PHONE_DISPLAY}
+                    </span>
+                  </span>
+                </a>
+
+                <a
+                  href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_DEFAULT_TEXT)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                >
+                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-600">
+                    <MessageCircle size={18} aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-semibold text-[rgb(var(--text-muted))]">{messages.contact.whatsapp}</span>
+                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-emerald-600">
+                      {messages.contact.whatsappCta}
+                    </span>
+                  </span>
+                </a>
+              </div>
+
+              <form className="grid gap-5" onSubmit={submitContactForm} noValidate>
+                <div className="grid gap-2 text-left">
+                  <label className="text-sm font-medium text-[rgb(var(--text))]" htmlFor="contact-name">
+                    {messages.contact.formNameLabel}
+                  </label>
+                  <input
+                    id="contact-name"
+                    value={contactValues.name}
+                    onChange={onContactChange("name")}
+                    autoComplete="name"
+                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    aria-invalid={!!contactErrors.name}
+                  />
+                  {contactErrors.name && <div className="text-sm text-rose-500">{contactErrors.name}</div>}
+                </div>
+
+                <div className="grid gap-2 text-left">
+                  <label className="text-sm font-medium text-[rgb(var(--text))]" htmlFor="contact-email">
+                    {messages.contact.formEmailLabel}
+                  </label>
+                  <input
+                    id="contact-email"
+                    value={contactValues.email}
+                    onChange={onContactChange("email")}
+                    autoComplete="email"
+                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    aria-invalid={!!contactErrors.email}
+                    inputMode="email"
+                  />
+                  {contactErrors.email && <div className="text-sm text-rose-500">{contactErrors.email}</div>}
+                </div>
+
+                <div className="grid gap-2 text-left">
+                  <label className="text-sm font-medium text-[rgb(var(--text))]" htmlFor="contact-subject">
+                    {messages.contact.formSubjectLabel}
+                  </label>
+                  <input
+                    id="contact-subject"
+                    value={contactValues.subject}
+                    onChange={onContactChange("subject")}
+                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    aria-invalid={!!contactErrors.subject}
+                  />
+                  {contactErrors.subject && <div className="text-sm text-rose-500">{contactErrors.subject}</div>}
+                </div>
+
+                <div className="grid gap-2 text-left">
+                  <label className="text-sm font-medium text-[rgb(var(--text))]" htmlFor="contact-message">
+                    {messages.contact.formMessageLabel}
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    value={contactValues.message}
+                    onChange={onContactChange("message")}
+                    rows={5}
+                    className="rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 py-3 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    aria-invalid={!!contactErrors.message}
+                  />
+                  {contactErrors.message && <div className="text-sm text-rose-500">{contactErrors.message}</div>}
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-h-[1.5rem] text-left text-sm">
+                    {contactStatus === "success" && (
+                      <div className="inline-flex items-center gap-2 text-emerald-500">
+                        <CircleCheck size={16} aria-hidden="true" />
+                        <span>{messages.contact.formSuccess}</span>
+                      </div>
+                    )}
+                    {contactStatus === "error" && (
+                      <div className="inline-flex items-center gap-2 text-rose-500">
+                        <TriangleAlert size={16} aria-hidden="true" />
+                        <span>{messages.contact.formError}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={contactStatus === "submitting"}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition disabled:opacity-70"
+                  >
+                    {contactStatus === "submitting" && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
+                    <span>
+                      {contactStatus === "submitting" ? messages.contact.formSubmitting : messages.contact.formSubmit}
+                    </span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         </div>
       </motion.section>
 
-      <motion.footer 
-        className="bg-slate-950 py-12 px-6 border-t border-slate-800"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.p 
-            className="text-slate-400 mb-2"
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            © 2024 Brundone Junior Kadjio Sonna. Développeur Full-Stack passionné.
-          </motion.p>
-          
-          <motion.p 
-            className="text-sm text-slate-500"
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Perfectionniste • Esprit d&apos;equipe • Créatif • Adaptable
-          </motion.p>
-        </div>
-      </motion.footer>
+      <SiteFooter />
 
       <motion.button
         type="button"
         aria-label="Revenir en haut"
         onClick={() => window.scrollTo({ top: 0, behavior: shouldReduceMotion ? "auto" : "smooth" })}
-        className="fixed bottom-6 right-6 z-50 grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-white/10 text-white shadow-lg shadow-black/30 backdrop-blur-xl transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+        className="fixed bottom-6 right-6 z-50 grid h-12 w-12 place-items-center rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] shadow-lg shadow-black/15 backdrop-blur-xl transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
         initial={false}
         animate={{
           opacity: showBackToTop ? 1 : 0,
