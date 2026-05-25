@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import nodemailer from "nodemailer";
 
 export const runtime = "nodejs";
@@ -42,6 +43,7 @@ function requireEnv(name: string) {
 
 export async function POST(req: Request) {
   try {
+    const locale = (await cookies()).get("NEXT_LOCALE")?.value === "en" ? "en" : "fr";
     const json = (await req.json()) as Partial<ContactPayload>;
     const payload = normalize(json);
     const errors = validate(payload);
@@ -61,21 +63,41 @@ export async function POST(req: Request) {
       },
     });
 
-    const subject = `[Portfolio] Nouveau message — ${payload.subject}`;
-    const text = [
-      "Bonjour,",
-      "",
-      "Vous avez reçu un nouveau message via le formulaire de contact de votre portfolio.",
-      "",
-      `Nom: ${payload.name}`,
-      `Email: ${payload.email}`,
-      "",
-      "Message:",
-      payload.message,
-      "",
-      "—",
-      "Répondez directement à cet email pour contacter la personne (Reply-To configuré).",
-    ].join("\n");
+    const subject =
+      locale === "fr"
+        ? `[Portfolio] Nouveau message — ${payload.subject}`
+        : `[Portfolio] New message — ${payload.subject}`;
+
+    const text =
+      locale === "fr"
+        ? [
+            "Bonjour,",
+            "",
+            "Vous avez reçu un nouveau message via le formulaire de contact de votre portfolio.",
+            "",
+            `Nom: ${payload.name}`,
+            `Email: ${payload.email}`,
+            "",
+            "Message:",
+            payload.message,
+            "",
+            "—",
+            "Répondez directement à cet email pour contacter la personne (Reply-To configuré).",
+          ].join("\n")
+        : [
+            "Hello,",
+            "",
+            "You have received a new message via your portfolio contact form.",
+            "",
+            `Name: ${payload.name}`,
+            `Email: ${payload.email}`,
+            "",
+            "Message:",
+            payload.message,
+            "",
+            "—",
+            "Reply directly to this email to contact the sender (Reply-To is configured).",
+          ].join("\n");
 
     await transporter.sendMail({
       from: gmailUser,

@@ -20,6 +20,7 @@ export type Messages = {
     experienceBadge: string;
     profileCardTitle: string;
     profileCardSubtitle: string;
+    floatingSkillLabel: string;
   };
   about: {
     title: string;
@@ -76,6 +77,10 @@ export type Messages = {
     line1: string;
     line2: string;
   };
+  a11y: {
+    profilePhotoAlt: string;
+    backToTop: string;
+  };
   projectDetail: {
     backToProjects: string;
     summary: string;
@@ -115,8 +120,9 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
       ctaCv: "Demander mon CV",
       followMe: "Suivez-moi",
       experienceBadge: "4+ ANS D'EXPÉRIENCE",
-      profileCardTitle: "Expert React & Java & Node",
+      profileCardTitle: "Développeur Full‑Stack Web & Mobile",
       profileCardSubtitle: "Prêt à relever de nouveaux défis",
+      floatingSkillLabel: "Technologie",
     },
     about: {
       title: "À Propos de Moi",
@@ -175,6 +181,10 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
       line1: "© 2024 Brundone Junior Kadjio Sonna. Développeur Full-Stack passionné.",
       line2: "Perfectionniste • Esprit d'equipe • Créatif • Adaptable",
     },
+    a11y: {
+      profilePhotoAlt: "Photo de profil",
+      backToTop: "Revenir en haut",
+    },
     projectDetail: {
       backToProjects: "Retour aux projets",
       summary: "Résumé",
@@ -209,8 +219,9 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
       ctaCv: "Request my CV",
       followMe: "Follow me",
       experienceBadge: "4+ YEARS OF EXPERIENCE",
-      profileCardTitle: "React & Java & Node Expert",
+      profileCardTitle: "Full‑Stack Web & Mobile Developer",
       profileCardSubtitle: "Ready for new challenges",
+      floatingSkillLabel: "Technology",
     },
     about: {
       title: "About Me",
@@ -268,6 +279,10 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
     footer: {
       line1: "© 2024 Brundone Junior Kadjio Sonna. Passionate Full-Stack Developer.",
       line2: "Detail-oriented • Team mindset • Creative • Adaptable",
+    },
+    a11y: {
+      profilePhotoAlt: "Profile photo",
+      backToTop: "Back to top",
     },
     projectDetail: {
       backToProjects: "Back to projects",

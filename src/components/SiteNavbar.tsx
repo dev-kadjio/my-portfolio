@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { Moon, Send, Sun } from "lucide-react";
 import { useI18n } from "./I18nProvider";
 import { useTheme } from "./ThemeProvider";
 import { LanguageToggle } from "./LanguageToggle";
-import { NAV_ITEMS } from "../lib/home.constants";
+import { NAV_ITEMS, SITE_LOGO_SRC } from "../lib/home.constants";
 
 type Variant = "home" | "page";
 
@@ -100,15 +101,17 @@ export function SiteNavbar({ variant }: { variant: Variant }) {
               scrollToSection("accueil");
             }}
           >
-            <span className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
-              BK
+            {/* <span className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-blue-500/20">BK</span> */}
+            <span className="relative h-10 w-10 overflow-hidden rounded-xl shadow-lg shadow-black/10">
+              <Image src={SITE_LOGO_SRC} alt="BK.dev" fill sizes="40px" className="object-contain" priority />
             </span>
             <span className="hidden sm:block font-bold tracking-tight">BK.dev</span>
           </motion.a>
         ) : (
           <Link href="/" className="text-xl font-bold text-[rgb(var(--text))] flex items-center gap-2">
-            <span className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
-              BK
+            {/* <span className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-blue-500/20">BK</span> */}
+            <span className="relative h-10 w-10 overflow-hidden rounded-xl shadow-lg shadow-black/10">
+              <Image src={SITE_LOGO_SRC} alt="BK.dev" fill sizes="40px" className="object-contain" priority />
             </span>
             <span className="hidden sm:block font-bold tracking-tight">BK.dev</span>
           </Link>
@@ -135,7 +138,7 @@ export function SiteNavbar({ variant }: { variant: Variant }) {
               {variant === "home" && activeSection === item.id && (
                 <motion.div
                   layoutId="activeSection"
-                  className="absolute inset-0 bg-indigo-600 rounded-full shadow-lg shadow-indigo-500/25 -z-10"
+                  className="absolute inset-0 bg-blue-600 rounded-full shadow-lg shadow-blue-500/25 -z-10"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -150,7 +153,7 @@ export function SiteNavbar({ variant }: { variant: Variant }) {
           <motion.button
             type="button"
             aria-label={messages.controls.theme}
-            className="grid h-10 w-10 place-items-center rounded-full border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+            className="grid h-10 w-10 place-items-center rounded-full border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             onClick={toggleTheme}
@@ -171,7 +174,7 @@ export function SiteNavbar({ variant }: { variant: Variant }) {
             >
               <span className="hidden sm:inline">{messages.hero.ctaContact}</span>
               <span className="sm:hidden">{messages.nav.contact}</span>
-              <Send size={16} className="text-indigo-500" />
+              <Send size={16} className="text-blue-500" />
             </motion.a>
           ) : (
             <Link
@@ -180,7 +183,7 @@ export function SiteNavbar({ variant }: { variant: Variant }) {
             >
               <span className="hidden sm:inline">{messages.hero.ctaContact}</span>
               <span className="sm:hidden">{messages.nav.contact}</span>
-              <Send size={16} className="text-indigo-500" />
+              <Send size={16} className="text-blue-500" />
             </Link>
           )}
         </div>
@@ -188,4 +191,3 @@ export function SiteNavbar({ variant }: { variant: Variant }) {
     </motion.nav>
   );
 }
-

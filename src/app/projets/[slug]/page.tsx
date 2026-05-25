@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { PROJECTS, getProjectBySlug } from "../../../data/projects";
 import { SiteFooter } from "../../../components/SiteFooter";
@@ -18,8 +19,9 @@ export async function generateMetadata({
   const project = getProjectBySlug(slug);
   if (!project) return {};
 
-  const title = `${project.title} | Projet`;
-  const description = project.description.fr;
+  const locale = (await cookies()).get("NEXT_LOCALE")?.value === "en" ? "en" : "fr";
+  const title = locale === "fr" ? `${project.title} | Projet` : `${project.title} | Project`;
+  const description = project.description[locale];
 
   return {
     title,
@@ -59,12 +61,13 @@ export default async function ProjectDetailPage({
   const project = getProjectBySlug(slug);
   if (!project) notFound();
 
+  const locale = (await cookies()).get("NEXT_LOCALE")?.value === "en" ? "en" : "fr";
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: project.title,
-    description: project.description.fr,
+    description: project.description[locale],
     url: `${baseUrl}/projets/${project.slug}`,
     creator: {
       "@type": "Person",

@@ -17,7 +17,7 @@ export function ProjectDetailClient({ project }: { project: Project }) {
         <div className="mb-10 flex items-center justify-between gap-4">
           <Link
             href="/#projets"
-            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-4 py-2 text-sm font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-4 py-2 text-sm font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
           >
             <ArrowLeft size={18} aria-hidden="true" />
             <span>{messages.projectDetail.backToProjects}</span>
@@ -30,7 +30,7 @@ export function ProjectDetailClient({ project }: { project: Project }) {
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-4 py-2 text-sm font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-4 py-2 text-sm font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
               >
                 <span>{getProjectText(l.label, locale)}</span>
                 <ExternalLink size={16} aria-hidden="true" />
@@ -42,7 +42,7 @@ export function ProjectDetailClient({ project }: { project: Project }) {
         <header className="grid gap-10 lg:grid-cols-[1.4fr_0.9fr]">
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel))] px-4 py-2 text-xs font-semibold text-[rgb(var(--text-subtle))]">
-              <span className="h-2 w-2 rounded-full bg-indigo-500" />
+              <span className="h-2 w-2 rounded-full bg-blue-500" />
               <span>{getProjectText(project.company, locale)}</span>
               <span className="text-[rgb(var(--text-faint))]">•</span>
               <span className="text-[rgb(var(--text-muted))]">{getProjectText(project.role, locale)}</span>
@@ -59,7 +59,7 @@ export function ProjectDetailClient({ project }: { project: Project }) {
               {project.tech.map((t) => (
                 <span
                   key={`${project.slug}-${t}`}
-                  className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-700"
+                  className="rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-700"
                 >
                   {t}
                 </span>
@@ -97,7 +97,7 @@ export function ProjectDetailClient({ project }: { project: Project }) {
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-between gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+                  className="inline-flex items-center justify-between gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
                 >
                   <span className="truncate">{getProjectText(l.label, locale)}</span>
                   <ExternalLink size={16} aria-hidden="true" />

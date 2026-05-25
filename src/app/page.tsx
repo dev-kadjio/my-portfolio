@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 
 
-function FloatingSkills({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
+function FloatingSkills({ shouldReduceMotion, label }: { shouldReduceMotion: boolean; label: string }) {
   return (
     // Conteneur absolu pour positionner les badges autour de la carte (décoratif).
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -83,7 +83,7 @@ function FloatingSkills({ shouldReduceMotion }: { shouldReduceMotion: boolean })
             </span>
             <div className="leading-tight">
               <div className="text-sm font-semibold text-[rgb(var(--text))]">{skill.name}</div>
-              <div className="text-xs text-[rgb(var(--text-muted))]">Stack</div>
+              <div className="text-xs text-[rgb(var(--text-muted))]">{label}</div>
             </div>
           </div>
         </motion.div>
@@ -174,7 +174,7 @@ export default function Home() {
 
   const ambientBackground =
     theme === "dark"
-      ? "radial-gradient(1200px circle at 20% 10%, rgba(99,102,241,0.18), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(56,189,248,0.12), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(139,92,246,0.12), transparent 55%)"
+      ? "radial-gradient(1200px circle at 20% 10%, rgba(37,99,235,0.18), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(56,189,248,0.12), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(59,130,246,0.12), transparent 55%)"
       : "radial-gradient(1200px circle at 18% 10%, rgba(16,185,129,0.10), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(220,38,38,0.08), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(250,204,21,0.10), transparent 55%)";
 
   return (
@@ -188,7 +188,7 @@ export default function Home() {
       />
 
       <motion.div
-        className="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-emerald-600 via-red-600 to-yellow-400"
+        className="fixed inset-x-0 top-0 z-60 h-1 origin-left bg-linear-to-r from-green-600 via-red-600 to-yellow-400"
         style={{ scaleX: scrollProgress }}
         aria-hidden="true"
       />
@@ -199,7 +199,7 @@ export default function Home() {
         id="accueil"
         className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden pt-24 lg:pt-32"
       >
-        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
 
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
@@ -211,12 +211,12 @@ export default function Home() {
             className="text-left"
           >
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--panel-bg)/var(--panel-soft))] border border-[rgb(var(--border)/var(--border-soft))] text-indigo-600 mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--panel-bg)/var(--panel-soft))] border border-[rgb(var(--border)/var(--border-soft))] text-blue-600 mb-6"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.2 }}
             >
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
               <span className="text-sm font-medium">{messages.hero.available}</span>
             </motion.div>
 
@@ -227,11 +227,11 @@ export default function Home() {
               transition={{ delay: shouldReduceMotion ? 0 : 0.3 }}
             >
               {messages.hero.titleLine1} <br />
-              <span className="text-indigo-500">{messages.hero.titleLine2}</span>
+              <span className="text-blue-600">{messages.hero.titleLine2}</span>
             </motion.h1>
 
             <motion.p
-              className="text-xl text-indigo-600 mb-6 font-light"
+              className="text-xl text-blue-600 mb-6 font-light"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: shouldReduceMotion ? 0 : 0.4 }}
@@ -256,7 +256,7 @@ export default function Home() {
             >
               <motion.a
                 href="#contact"
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/25 text-sm"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/25 text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={(e) => {
@@ -302,7 +302,7 @@ export default function Home() {
                       target={social.key !== "mail" ? "_blank" : undefined}
                       rel="noopener noreferrer"
                       aria-label={social.label}
-                      className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+                      className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
                     >
                       <Icon size={20} aria-hidden="true" />
                     </a>
@@ -319,7 +319,7 @@ export default function Home() {
             transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
           >
             <motion.div
-              className="absolute inset-0 bg-indigo-600 rounded-[2rem] rotate-3 opacity-20 blur-xl"
+              className="absolute inset-0 bg-blue-600 rounded-[2rem] rotate-3 opacity-20 blur-xl"
               animate={
                 shouldReduceMotion
                   ? undefined
@@ -333,7 +333,7 @@ export default function Home() {
 
             <div className="relative w-full max-w-sm aspect-[4/5] bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group">
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full bg-[rgb(var(--panel-bg)/0.92)] backdrop-blur-sm border-t border-[rgb(var(--border)/var(--border-soft))]">
-                <div className="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-700 rounded-full text-xs font-bold mb-2 border border-indigo-500/30">
+                <div className="inline-block px-3 py-1 bg-blue-500/20 text-blue-700 rounded-full text-xs font-bold mb-2 border border-blue-500/30">
                   {messages.hero.experienceBadge}
                 </div>
                 <a
@@ -344,11 +344,11 @@ export default function Home() {
                     scrollToSection("competences");
                   }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center group-hover/arrow:bg-indigo-500 transition-all duration-300">
-                    <ArrowRight size={16} className="text-indigo-400 group-hover/arrow:text-white transition-colors group-hover/arrow:translate-x-0.5" />
+                  <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center group-hover/arrow:bg-blue-500 transition-all duration-300">
+                    <ArrowRight size={16} className="text-blue-500 group-hover/arrow:text-white transition-colors group-hover/arrow:translate-x-0.5" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[rgb(var(--text))] mb-0.5 group-hover/arrow:text-indigo-500 transition-colors">
+                    <h3 className="text-xl font-bold text-[rgb(var(--text))] mb-0.5 group-hover/arrow:text-blue-600 transition-colors">
                       {messages.hero.profileCardTitle}
                     </h3>
                     <p className="text-[rgb(var(--text-muted))] text-xs">{messages.hero.profileCardSubtitle}</p>
@@ -358,7 +358,7 @@ export default function Home() {
 
               <Image
                 src="/images/profil.jpg"
-                alt="Photo de profil"
+                alt={messages.a11y.profilePhotoAlt}
                 fill
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 priority
@@ -366,7 +366,7 @@ export default function Home() {
             </div>
 
             {/* Badges de compétences flottants autour de la photo (effet visuel). */}
-            <FloatingSkills shouldReduceMotion={!!shouldReduceMotion} />
+            <FloatingSkills shouldReduceMotion={!!shouldReduceMotion} label={messages.hero.floatingSkillLabel} />
           </motion.div>
 
         </div>
@@ -388,7 +388,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <User className="text-indigo-400" size={40} />
+            <User className="text-blue-500" size={40} />
             {messages.about.title}
           </motion.h2>
 
@@ -399,17 +399,17 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-semibold mb-6 text-indigo-500">{messages.about.journeyTitle}</h3>
+              <h3 className="text-2xl font-semibold mb-6 text-blue-600">{messages.about.journeyTitle}</h3>
               <p className="text-[rgb(var(--text-subtle))] leading-relaxed mb-6">{messages.about.journeyP1}</p>
               <p className="text-[rgb(var(--text-subtle))] leading-relaxed mb-8">{messages.about.journeyP2}</p>
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="bg-[rgb(var(--panel-bg)/var(--panel))] p-4 rounded-lg border border-[rgb(var(--border)/var(--border-soft))]">
-                  <div className="text-2xl font-bold text-indigo-500 mb-1">{messages.about.years}</div>
+                  <div className="text-2xl font-bold text-blue-600 mb-1">{messages.about.years}</div>
                   <div className="text-sm text-[rgb(var(--text-muted))]">{messages.about.yearsLabel}</div>
                 </div>
                 <div className="bg-[rgb(var(--panel-bg)/var(--panel))] p-4 rounded-lg border border-[rgb(var(--border)/var(--border-soft))]">
-                  <div className="text-2xl font-bold text-indigo-400 mb-1">{PROJECTS.length}</div>
+                  <div className="text-2xl font-bold text-blue-600 mb-1">{PROJECTS.length}</div>
                   <div className="text-sm text-[rgb(var(--text-muted))]">{messages.about.projectsLabel}</div>
                 </div>
               </div>
@@ -421,12 +421,12 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-semibold mb-6 text-indigo-500">{messages.about.expTitle}</h3>
+              <h3 className="text-2xl font-semibold mb-6 text-blue-600">{messages.about.expTitle}</h3>
               <div className="space-y-6">
                 {EXPERIENCES.map((exp, index) => (
                   <motion.div
-                    key={`${exp.company}-${exp.period}`}
-                    className="bg-[rgb(var(--panel-bg)/var(--panel))] p-6 rounded-lg border border-[rgb(var(--border)/var(--border-soft))] hover:border-indigo-500 transition-all duration-300"
+                    key={`${exp.company.fr}-${exp.period.fr}`}
+                    className="bg-[rgb(var(--panel-bg)/var(--panel))] p-6 rounded-lg border border-[rgb(var(--border)/var(--border-soft))] hover:border-blue-500 transition-all duration-300"
                     whileHover={{ scale: 1.02 }}
                     initial={{ y: 20, opacity: 0 }}
                     whileInView={{ y: 0, opacity: 1 }}
@@ -438,20 +438,20 @@ export default function Home() {
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h4 className="text-lg font-semibold text-indigo-500">{exp.title}</h4>
+                        <h4 className="text-lg font-semibold text-blue-600">{exp.title[locale]}</h4>
                         <p className="text-[rgb(var(--text-muted))] flex items-center gap-2">
                           <Building2 size={16} />
-                          {exp.company}
+                          {exp.company[locale]}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-indigo-500 font-medium">{exp.period}</p>
-                        <p className="text-[rgb(var(--text-faint))] text-sm">{exp.duration}</p>
+                        <p className="text-blue-600 font-medium">{exp.period[locale]}</p>
+                        <p className="text-[rgb(var(--text-faint))] text-sm">{exp.duration[locale]}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-[rgb(var(--text-muted))]">
                       <MapPin size={14} />
-                      {exp.location}
+                      {exp.location[locale]}
                     </div>
                   </motion.div>
                 ))}
@@ -477,7 +477,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <Briefcase className="text-indigo-400" size={40} />
+            <Briefcase className="text-blue-500" size={40} />
             {messages.projects.title}
           </motion.h2>
 
@@ -485,7 +485,7 @@ export default function Home() {
             {PROJECTS.map((project, index) => (
               <motion.div
                 key={project.slug}
-                className="bg-[rgb(var(--panel-bg)/var(--panel))] rounded-xl p-8 border border-[rgb(var(--border)/var(--border-soft))] hover:border-indigo-500 transition-all duration-300 group"
+                className="bg-[rgb(var(--panel-bg)/var(--panel))] rounded-xl p-8 border border-[rgb(var(--border)/var(--border-soft))] hover:border-blue-500 transition-all duration-300 group"
                 initial={{ y: 50, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{
@@ -495,29 +495,32 @@ export default function Home() {
                 viewport={{ once: true }}
                 whileHover={{
                   scale: 1.03,
-                  boxShadow: "0 20px 40px rgba(99, 102, 241, 0.1)"
+                  boxShadow: "0 20px 40px rgba(37, 99, 235, 0.1)"
                 }}
               >
                 <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-xl font-bold text-indigo-600 group-hover:text-indigo-500 transition-colors">
+                  <h3 className="text-xl font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
                     {project.title}
                   </h3>
                   <div className="flex items-center gap-2">
-                    {(project.links ?? []).slice(0, 1).map((l) => (
-                      <motion.a
-                        key={`${project.slug}-${l.href}`}
-                        href={l.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${project.title} - ${getProjectText(l.label, locale)}`}
-                        className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <span>{getProjectText(l.label, locale)}</span>
-                        <ExternalLink size={16} aria-hidden="true" />
-                      </motion.a>
-                    ))}
+                    {(project.links ?? [])
+                      // .slice(0, 1)
+                      .slice(0, 2)
+                      .map((l) => (
+                        <motion.a
+                          key={`${project.slug}-${l.href}`}
+                          href={l.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${project.title} - ${getProjectText(l.label, locale)}`}
+                          className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span>{getProjectText(l.label, locale)}</span>
+                          <ExternalLink size={16} aria-hidden="true" />
+                        </motion.a>
+                      ))}
                   </div>
                 </div>
 
@@ -526,7 +529,7 @@ export default function Home() {
                     <Building2 size={16} />
                     {getProjectText(project.company, locale)}
                   </p>
-                  <p className="text-indigo-600 text-sm mb-4">{getProjectText(project.role, locale)}</p>
+                  <p className="text-blue-600 text-sm mb-4">{getProjectText(project.role, locale)}</p>
                 </div>
 
                 <p className="text-[rgb(var(--text-subtle))] mb-6 leading-relaxed">
@@ -537,8 +540,8 @@ export default function Home() {
                   {project.tech.slice(0, 4).map((tech, i) => (
                     <motion.span
                       key={i}
-                      className="text-xs bg-indigo-500/10 px-3 py-1 rounded-full text-indigo-700 border border-indigo-500/20"
-                      whileHover={{ scale: 1.05, backgroundColor: "rgba(99, 102, 241, 0.2)" }}
+                      className="text-xs bg-blue-500/10 px-3 py-1 rounded-full text-blue-700 border border-blue-500/20"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgba(37, 99, 235, 0.2)" }}
                     >
                       {tech}
                     </motion.span>
@@ -552,13 +555,13 @@ export default function Home() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm text-[rgb(var(--text-muted))]">
-                    <Star size={14} className="text-indigo-400" />
+                    <Star size={14} className="text-blue-500" />
                     <span>{messages.projects.featured}</span>
                   </div>
                   <Link
                     href={`/projets/${project.slug}`}
-                    aria-label={`Voir le projet - ${project.title}`}
-                    className="inline-flex items-center gap-2 text-indigo-600 text-sm font-medium transition hover:text-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))] rounded-md"
+                    aria-label={`${messages.projects.viewProject} - ${project.title}`}
+                    className="inline-flex items-center gap-2 text-blue-600 text-sm font-medium transition hover:text-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))] rounded-md"
                   >
                     <motion.span whileHover={{ x: 5 }} className="inline-flex items-center gap-2">
                       <span>{messages.projects.viewProject}</span>
@@ -588,12 +591,12 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <Award className="text-indigo-400" size={40} />
+            <Award className="text-blue-500" size={40} />
             {messages.skills.title}
           </motion.h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.entries(SKILLS).map(([category, items], index) => (
+            {(Object.keys(SKILLS) as Array<keyof typeof SKILLS>).map((category, index) => (
               <motion.div
                 key={category}
                 className="bg-[rgb(var(--panel-bg)/var(--panel))] p-8 rounded-xl border border-[rgb(var(--border)/var(--border-soft))]"
@@ -606,17 +609,17 @@ export default function Home() {
                 viewport={{ once: true }}
                 whileHover={{
                   scale: 1.02,
-                  borderColor: "rgba(99, 102, 241, 0.5)"
+                  borderColor: "rgba(37, 99, 235, 0.5)"
                 }}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  {category === "backend" && <Cpu className="text-indigo-400" size={24} />}
-                  {category === "frontend" && <Globe className="text-indigo-400" size={24} />}
-                  {category === "mobile" && <Phone className="text-indigo-400" size={24} />}
-                  {category === "database" && <Database className="text-indigo-400" size={24} />}
-                  {category === "tools" && <Wrench className="text-indigo-400" size={24} />}
+                  {category === "backend" && <Cpu className="text-blue-500" size={24} />}
+                  {category === "frontend" && <Globe className="text-blue-500" size={24} />}
+                  {category === "mobile" && <Phone className="text-blue-500" size={24} />}
+                  {category === "database" && <Database className="text-blue-500" size={24} />}
+                  {category === "tools" && <Wrench className="text-blue-500" size={24} />}
 
-                  <h3 className="text-xl font-semibold text-indigo-600 capitalize">
+                  <h3 className="text-xl font-semibold text-blue-600 capitalize">
                     {category === "backend"
                       ? messages.skills.backend
                       : category === "frontend"
@@ -630,14 +633,14 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {items.map((skill) => (
+                  {SKILLS[category][locale].map((skill) => (
                     <motion.span
                       key={skill}
-                      className="text-sm bg-indigo-500/10 px-3 py-1 rounded-full text-indigo-700 border border-indigo-500/20"
+                      className="text-sm bg-blue-500/10 px-3 py-1 rounded-full text-blue-700 border border-blue-500/20"
                       whileHover={{
                         scale: 1.05,
-                        backgroundColor: "rgba(99, 102, 241, 0.3)",
-                        borderColor: "rgba(99, 102, 241, 0.5)"
+                        backgroundColor: "rgba(37, 99, 235, 0.3)",
+                        borderColor: "rgba(37, 99, 235, 0.5)"
                       }}
                     >
                       {skill}
@@ -662,14 +665,14 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <GraduationCap className="text-indigo-400" size={32} />
+              <GraduationCap className="text-blue-500" size={32} />
               {messages.skills.educationTitle}
             </motion.h3>
 
             <div className="grid md:grid-cols-2 gap-8">
               {EDUCATION.map((edu, index) => (
                 <motion.div
-                  key={edu.title}
+                  key={edu.title.fr}
                   className="bg-[rgb(var(--panel-bg)/var(--panel))] p-8 rounded-xl border border-[rgb(var(--border)/var(--border-soft))]"
                   initial={{ x: index % 2 === 0 ? -50 : 50, opacity: 0 }}
                   whileInView={{ x: 0, opacity: 1 }}
@@ -677,28 +680,28 @@ export default function Home() {
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.02 }}
                 >
-                  <h4 className="text-xl font-semibold text-indigo-600 mb-3">
-                    {edu.title}
-                  </h4>
+                  <h4 className="text-xl font-semibold text-blue-600 mb-3">{edu.title[locale]}</h4>
                   <p className="text-[rgb(var(--text-muted))] mb-2 flex items-center gap-2">
                     <Building2 size={16} />
-                    {edu.school}
+                    {edu.school[locale]}
                   </p>
                   <p className="text-sm text-[rgb(var(--text-faint))] mb-4 flex items-center gap-2">
                     <Clock size={14} />
-                    {edu.period}
+                    {edu.period[locale]}
                   </p>
-                  {Array.isArray(edu.details) ? (
+                  {Array.isArray(edu.details[locale]) ? (
                     <ul className="grid gap-2 text-sm text-[rgb(var(--text-subtle))]">
-                      {edu.details.map((d) => (
+                      {(edu.details[locale] as string[]).map((d) => (
                         <li key={d} className="flex gap-2">
-                          <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400/80" />
+                          <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500/80" />
                           <span className="leading-relaxed">{d}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-[rgb(var(--text-subtle))] text-sm leading-relaxed">{edu.details}</p>
+                    <p className="text-[rgb(var(--text-subtle))] text-sm leading-relaxed">
+                      {edu.details[locale] as string}
+                    </p>
                   )}
                 </motion.div>
               ))}
@@ -752,14 +755,14 @@ export default function Home() {
 
               <div className="grid gap-6">
                 <motion.div className="flex items-center gap-4" whileHover={{ scale: 1.02 }}>
-                  <div className="p-3 bg-indigo-600/15 rounded-full border border-indigo-500/25">
-                    <Mail className="text-indigo-600" size={22} />
+                  <div className="p-3 bg-blue-600/15 rounded-full border border-blue-500/25">
+                    <Mail className="text-blue-600" size={22} />
                   </div>
                   <div className="text-left">
                     <p className="text-[rgb(var(--text-muted))] text-sm">{messages.contact.email}</p>
                     <a
                       href="mailto:devkadjio@gmail.com"
-                      className="text-[rgb(var(--text))] hover:text-indigo-600 transition-colors font-medium"
+                      className="text-[rgb(var(--text))] hover:text-blue-600 transition-colors font-medium"
                     >
                       devkadjio@gmail.com
                     </a>
@@ -767,14 +770,14 @@ export default function Home() {
                 </motion.div>
 
                 <motion.div className="flex items-center gap-4" whileHover={{ scale: 1.02 }}>
-                  <div className="p-3 bg-indigo-600/15 rounded-full border border-indigo-500/25">
-                    <Phone className="text-indigo-600" size={22} />
+                  <div className="p-3 bg-blue-600/15 rounded-full border border-blue-500/25">
+                    <Phone className="text-blue-600" size={22} />
                   </div>
                   <div className="text-left">
                     <p className="text-[rgb(var(--text-muted))] text-sm">{messages.contact.phone}</p>
                     <a
                       href="tel:+237652027456"
-                      className="text-[rgb(var(--text))] hover:text-indigo-600 transition-colors font-medium"
+                      className="text-[rgb(var(--text))] hover:text-blue-600 transition-colors font-medium"
                     >
                       +237 6 52 02 74 56
                     </a>
@@ -785,7 +788,7 @@ export default function Home() {
               <div className="mt-10 flex justify-start">
                 <motion.a
                   href="mailto:devkadjio@gmail.com"
-                  className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 px-7 py-3.5 rounded-xl font-semibold text-white transition-all duration-300"
+                  className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-7 py-3.5 rounded-xl font-semibold text-white transition-all duration-300"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -811,14 +814,14 @@ export default function Home() {
               <div className="mb-8 grid gap-3 sm:grid-cols-3">
                 <a
                   href={`mailto:${CONTACT_EMAIL}`}
-                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                 >
-                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-600">
                     <Mail size={18} aria-hidden="true" />
                   </span>
                   <span className="min-w-0">
                     <span className="block text-xs font-semibold text-[rgb(var(--text-muted))]">{messages.contact.email}</span>
-                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-indigo-600">
+                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-blue-600">
                       {CONTACT_EMAIL}
                     </span>
                   </span>
@@ -826,24 +829,24 @@ export default function Home() {
 
                 <a
                   href={`tel:${CONTACT_PHONE_E164}`}
-                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                 >
-                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-600">
                     <Phone size={18} aria-hidden="true" />
                   </span>
                   <span className="min-w-0">
                     <span className="block text-xs font-semibold text-[rgb(var(--text-muted))]">{messages.contact.phone}</span>
-                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-indigo-600">
+                    <span className="block truncate text-sm font-semibold text-[rgb(var(--text))] group-hover:text-blue-600">
                       {CONTACT_PHONE_DISPLAY}
                     </span>
                   </span>
                 </a>
 
                 <a
-                  href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_DEFAULT_TEXT)}`}
+                  href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_DEFAULT_TEXT[locale])}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  className="group flex items-center gap-3 rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 text-left transition hover:bg-[rgb(var(--panel-bg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                 >
                   <span className="grid h-10 w-10 place-items-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-600">
                     <MessageCircle size={18} aria-hidden="true" />
@@ -867,7 +870,7 @@ export default function Home() {
                     value={contactValues.name}
                     onChange={onContactChange("name")}
                     autoComplete="name"
-                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                     aria-invalid={!!contactErrors.name}
                   />
                   {contactErrors.name && <div className="text-sm text-rose-500">{contactErrors.name}</div>}
@@ -882,7 +885,7 @@ export default function Home() {
                     value={contactValues.email}
                     onChange={onContactChange("email")}
                     autoComplete="email"
-                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                     aria-invalid={!!contactErrors.email}
                     inputMode="email"
                   />
@@ -897,7 +900,7 @@ export default function Home() {
                     id="contact-subject"
                     value={contactValues.subject}
                     onChange={onContactChange("subject")}
-                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    className="h-11 rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                     aria-invalid={!!contactErrors.subject}
                   />
                   {contactErrors.subject && <div className="text-sm text-rose-500">{contactErrors.subject}</div>}
@@ -912,7 +915,7 @@ export default function Home() {
                     value={contactValues.message}
                     onChange={onContactChange("message")}
                     rows={5}
-                    className="rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 py-3 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    className="rounded-xl border border-[rgb(var(--border)/0.55)] bg-[rgb(var(--panel-bg))] px-4 py-3 text-sm text-[rgb(var(--text))] outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                     aria-invalid={!!contactErrors.message}
                   />
                   {contactErrors.message && <div className="text-sm text-rose-500">{contactErrors.message}</div>}
@@ -937,9 +940,10 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={contactStatus === "submitting"}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition disabled:opacity-70"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition disabled:opacity-70"
                   >
                     {contactStatus === "submitting" && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
+                    {contactStatus !== "submitting" && <Send size={16} aria-hidden="true" />}
                     <span>
                       {contactStatus === "submitting" ? messages.contact.formSubmitting : messages.contact.formSubmit}
                     </span>
@@ -955,9 +959,9 @@ export default function Home() {
 
       <motion.button
         type="button"
-        aria-label="Revenir en haut"
+        aria-label={messages.a11y.backToTop}
         onClick={() => window.scrollTo({ top: 0, behavior: shouldReduceMotion ? "auto" : "smooth" })}
-        className="fixed bottom-6 right-6 z-50 grid h-12 w-12 place-items-center rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] shadow-lg shadow-black/15 backdrop-blur-xl transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+        className="fixed bottom-6 right-6 z-50 grid h-12 w-12 place-items-center rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text))] shadow-lg shadow-black/15 backdrop-blur-xl transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
         initial={false}
         animate={{
           opacity: showBackToTop ? 1 : 0,
