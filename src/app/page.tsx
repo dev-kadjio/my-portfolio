@@ -48,6 +48,7 @@ import {
   TriangleAlert,
   MessageCircle,
 } from "lucide-react";
+import profileImage from "../../public/images/profil.jpg";
 
 
 function FloatingSkills({ shouldReduceMotion, label }: { shouldReduceMotion: boolean; label: string }) {
@@ -79,7 +80,14 @@ function FloatingSkills({ shouldReduceMotion, label }: { shouldReduceMotion: boo
         >
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))]">
-              <img src={skill.logoSrc} alt="" className="h-5 w-5" />
+              <img
+                src={skill.logoSrc}
+                alt=""
+                className="h-5 w-5"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+              />
             </span>
             <div className="leading-tight">
               <div className="text-sm font-semibold text-[rgb(var(--text))]">{skill.name}</div>
@@ -331,7 +339,10 @@ export default function Home() {
               transition={{ duration: shouldReduceMotion ? 0 : 5, repeat: shouldReduceMotion ? 0 : Infinity }}
             />
 
-            <div className="relative w-full max-w-sm aspect-[4/5] bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group">
+            <div
+              // className="relative w-full max-w-sm aspect-[4/5] bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group"
+              className="relative w-full max-w-sm aspect-4/5 bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group"
+            >
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full bg-[rgb(var(--panel-bg)/0.92)] backdrop-blur-sm border-t border-[rgb(var(--border)/var(--border-soft))]">
                 <div className="inline-block px-3 py-1 bg-blue-500/20 text-blue-700 rounded-full text-xs font-bold mb-2 border border-blue-500/30">
                   {messages.hero.experienceBadge}
@@ -357,12 +368,14 @@ export default function Home() {
               </div>
 
               <Image
-                src="/images/profil.jpg"
+                src={profileImage}
                 alt={messages.a11y.profilePhotoAlt}
                 fill
                 sizes="(max-width: 640px) 92vw, (max-width: 1024px) 420px, 384px"
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 priority
+                placeholder="blur"
+                quality={75}
               />
             </div>
 
