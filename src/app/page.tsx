@@ -360,6 +360,7 @@ export default function Home() {
                 src="/images/profil.jpg"
                 alt={messages.a11y.profilePhotoAlt}
                 fill
+                sizes="(max-width: 640px) 92vw, (max-width: 1024px) 420px, 384px"
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 priority
               />
