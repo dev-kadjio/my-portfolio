@@ -58,71 +58,69 @@ export const SOCIAL_LINKS: readonly SocialLink[] = [
 ] as const;
 
 export const SKILLS = {
-  backend: {
+  backendServer: {
     fr: [
-      "Java 17 · Spring Boot 3",
-      "Spring Security (OAuth2 · JWT)",
+      "Java 17",
+      "Spring Boot 3",
+      "Spring Security (OAuth 2.0 · JWT)",
       "Hibernate / JPA (ORM)",
       "Architecture n‑tiers & MVC",
-      "Microservices (bases) · Spring Cloud (bases)",
-      "APIs REST backend",
-      "Bases de données : SQL (MySQL, PostgreSQL) · NoSQL (MongoDB, DynamoDB)",
-      "Node.js & Python",
+      "Microservices (bases)",
+      "Spring Cloud (bases)",
+      "Bases de données (M) : SQL (MySQL, PostgreSQL) · NoSQL (MongoDB, DynamoDB)",
+      "Déploiement & CI/CD (bases) : Docker · GitLab CI/CD",
     ],
     en: [
-      "Java 17 · Spring Boot 3",
-      "Spring Security (OAuth2 · JWT)",
+      "Java 17",
+      "Spring Boot 3",
+      "Spring Security (OAuth 2.0 · JWT)",
       "Hibernate / JPA (ORM)",
       "N‑tier architecture & MVC",
-      "Microservices (basics) · Spring Cloud (basics)",
-      "Backend REST APIs",
+      "Microservices (basics)",
+      "Spring Cloud (basics)",
       "Databases: SQL (MySQL, PostgreSQL) · NoSQL (MongoDB, DynamoDB)",
-      "Node.js & Python",
+      "Deployment & CI/CD (basics): Docker · GitLab CI/CD",
     ],
   },
-  frontend: {
+  mobileDev: {
+    fr: ["Flutter · React Native — applications multiplateformes"],
+    en: ["Flutter · React Native — cross‑platform applications"],
+  },
+  frontendIntegration: {
+    fr: ["HTML · CSS · Tailwind · Material UI · Bootstrap"],
+    en: ["HTML · CSS · Tailwind · Material UI · Bootstrap"],
+  },
+  javascriptFrameworks: {
+    fr: ["JavaScript : Angular · Vue.js · Nuxt.js · React.js · Next.js"],
+    en: ["JavaScript: Angular · Vue.js · Nuxt.js · React · Next.js"],
+  },
+  testingTools: {
+    fr: ["JUnit · Mockito · Jest"],
+    en: ["JUnit · Mockito · Jest"],
+  },
+  toolsAi: {
     fr: [
-      "JavaScript : Angular · Vue.js · Nuxt.js · React · Next.js",
-      "HTML · CSS · Tailwind CSS · Bootstrap · Material UI",
-      "Vite",
-    ],
-    en: [
-      "JavaScript: Angular · Vue.js · Nuxt.js · React · Next.js",
-      "HTML · CSS · Tailwind CSS · Bootstrap · Material UI",
-      "Vite",
-    ],
-  },
-  mobile: {
-    fr: ["Flutter", "React Native", "Applications multiplateformes"],
-    en: ["Flutter", "React Native", "Cross‑platform apps"],
-  },
-  database: {
-    fr: ["SQL : MySQL · PostgreSQL", "NoSQL : MongoDB · DynamoDB", "Firestore · AWS DocumentDB"],
-    en: ["SQL: MySQL · PostgreSQL", "NoSQL: MongoDB · DynamoDB", "Firestore · AWS DocumentDB"],
-  },
-  tools: {
-    fr: [
-      "Déploiement & CI/CD : Docker · GitLab CI/CD",
-      "Outils de test : JUnit · Mockito · Jest",
-      "Versioning : Git · GitHub · GitLab",
-      "Gestion de projets : Agile (SCRUM) · Asana · Trello · Slack · Jira",
       "IDE : IntelliJ · VS Code · Android Studio",
       "Design / prototypage : Figma",
       "Outils IA (projets avancés) : Windsurf · Trae · Antigravity",
-      "Swagger / OpenAPI",
-      "SonarQube",
     ],
     en: [
-      "Deployment & CI/CD: Docker · GitLab CI/CD",
-      "Testing tools: JUnit · Mockito · Jest",
-      "Version control: Git · GitHub · GitLab",
-      "Project management: Agile (SCRUM) · Asana · Trello · Slack · Jira",
       "IDE: IntelliJ · VS Code · Android Studio",
       "Design / prototyping: Figma",
       "AI tools (advanced projects): Windsurf · Trae · Antigravity",
-      "Swagger / OpenAPI",
-      "SonarQube",
     ],
+  },
+  projectManagement: {
+    fr: ["Agile (SCRUM) · Asana · Trello · Slack · Jira"],
+    en: ["Agile (SCRUM) · Asana · Trello · Slack · Jira"],
+  },
+  versioning: {
+    fr: ["Git · GitHub · GitLab"],
+    en: ["Git · GitHub · GitLab"],
+  },
+  otherTech: {
+    fr: ["Node.js · Python"],
+    en: ["Node.js · Python"],
   },
 } as const;
 

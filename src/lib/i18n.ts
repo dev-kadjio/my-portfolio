@@ -40,11 +40,15 @@ export type Messages = {
   };
   skills: {
     title: string;
-    backend: string;
-    frontend: string;
-    mobile: string;
-    database: string;
-    tools: string;
+    backendServer: string;
+    mobileDev: string;
+    frontendIntegration: string;
+    javascriptFrameworks: string;
+    testingTools: string;
+    toolsAi: string;
+    projectManagement: string;
+    versioning: string;
+    otherTech: string;
     educationTitle: string;
   };
   contact: {
@@ -126,11 +130,11 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
     },
     about: {
       title: "À Propos de Moi",
-      journeyTitle: "Mon Parcours",
+      journeyTitle: "Parcours & approche",
       journeyP1:
-        "Développeur Full-Stack passionné avec plus de 4 ans d'expérience dans la création d'applications web et mobiles innovantes. Je transforme des idées complexes en solutions élégantes et performantes.",
+        "Je conçois et développe des produits numériques de bout en bout, du cadrage fonctionnel à la mise en production. Je suis particulièrement spécialisé en Java (Spring Boot), React, Angular et Flutter. Mon expérience couvre des contextes startup et entreprise, avec des projets orientés API, sécurité, données et interfaces utilisateur.",
       journeyP2:
-        "Spécialisé dans les technologies modernes comme React, Node.js, et Flutter, je m'efforce de créer des expériences utilisateur exceptionnelles tout en maintenant un code propre et maintenable.",
+        "J’accorde une importance particulière à la qualité logicielle : architecture claire, tests, documentation, observabilité et performance. J’aime travailler en équipe (Agile/Scrum) et livrer des fonctionnalités fiables et maintenables.",
       expTitle: "Expérience Professionnelle",
       years: "4+",
       projects: "Projets réalisés",
@@ -144,11 +148,15 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
     },
     skills: {
       title: "Compétences Techniques",
-      backend: "Backend",
-      frontend: "Frontend",
-      mobile: "Mobile",
-      database: "Base de Données",
-      tools: "Outils",
+      backendServer: "Backend / Serveur",
+      mobileDev: "Développement Mobile",
+      frontendIntegration: "Intégration / Frontend",
+      javascriptFrameworks: "JavaScript",
+      testingTools: "Outils de test",
+      toolsAi: "Outils & IA",
+      projectManagement: "Gestion de projets / Méthodologies",
+      versioning: "Versioning / Contrôle de code",
+      otherTech: "Autres technologies",
       educationTitle: "Formation",
     },
     contact: {
@@ -225,11 +233,11 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
     },
     about: {
       title: "About Me",
-      journeyTitle: "My Journey",
+      journeyTitle: "Journey & approach",
       journeyP1:
-        "Passionate Full-Stack developer with 4+ years of experience building innovative web and mobile applications. I turn complex ideas into elegant, high-performing solutions.",
+        "I build end‑to‑end digital products—from requirements and UX to production. I’m especially specialized in Java (Spring Boot), React, Angular and Flutter. My experience spans startup and enterprise environments, with projects involving APIs, security, data, and user‑facing interfaces.",
       journeyP2:
-        "Specialized in modern technologies like React, Node.js, and Flutter, I focus on crafting great user experiences while keeping code clean and maintainable.",
+        "I care deeply about engineering quality: clear architecture, testing, documentation, observability, and performance. I enjoy collaborating in Agile teams and shipping reliable, maintainable features.",
       expTitle: "Work Experience",
       years: "4+",
       projects: "Projects delivered",
@@ -243,11 +251,15 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
     },
     skills: {
       title: "Technical Skills",
-      backend: "Backend",
-      frontend: "Frontend",
-      mobile: "Mobile",
-      database: "Databases",
-      tools: "Tools",
+      backendServer: "Backend / Server",
+      mobileDev: "Mobile Development",
+      frontendIntegration: "Frontend Integration",
+      javascriptFrameworks: "JavaScript",
+      testingTools: "Testing Tools",
+      toolsAi: "Tools & AI",
+      projectManagement: "Project Management / Methodologies",
+      versioning: "Versioning / Source Control",
+      otherTech: "Other Technologies",
       educationTitle: "Education",
     },
     contact: {

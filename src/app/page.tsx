@@ -8,14 +8,13 @@ import { useI18n } from "../components/I18nProvider";
 import { useTheme } from "../components/ThemeProvider";
 import { SiteNavbar } from "../components/SiteNavbar";
 import { SiteFooter } from "../components/SiteFooter";
+import { SkillsSection } from "../components/skills/SkillsSection";
+import { FloatingSkills } from "../components/home/FloatingSkills";
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_E164,
-  EDUCATION,
   EXPERIENCES,
-  FLOATING_SKILLS,
-  SKILLS,
   SOCIAL_LINKS,
   WHATSAPP_DEFAULT_TEXT,
   WHATSAPP_PHONE,
@@ -28,17 +27,13 @@ import {
   Phone,
   MapPin,
   Briefcase,
-  GraduationCap,
-  Award,
+  // GraduationCap,
   ExternalLink,
   User,
   Building2,
-  Globe,
-  Cpu,
-  Database,
-  Wrench,
+  // Wrench,
   Star,
-  Clock,
+  // Clock,
   ArrowRight,
   Download,
   Send,
@@ -50,60 +45,11 @@ import {
 } from "lucide-react";
 import profileImage from "../../public/images/profil.jpg";
 
-
-function FloatingSkills({ shouldReduceMotion, label }: { shouldReduceMotion: boolean; label: string }) {
-  return (
-    // Conteneur absolu pour positionner les badges autour de la carte (décoratif).
-    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-      {FLOATING_SKILLS.map((skill, index) => (
-        <motion.div
-          key={`${skill.name}-${index}`}
-          className={[
-            "absolute z-30",
-            "rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-strong))] px-4 py-3 shadow-xl shadow-black/20 backdrop-blur-xl",
-            skill.accentClassName,
-            "hidden sm:block",
-            skill.positionClassName,
-          ].join(" ")}
-          animate={
-            shouldReduceMotion
-              ? undefined
-              : skill.floatAxis === "y"
-                ? { y: skill.floatValues }
-                : { x: skill.floatValues }
-          }
-          transition={{
-            duration: shouldReduceMotion ? 0 : skill.duration,
-            repeat: shouldReduceMotion ? 0 : Infinity,
-            delay: shouldReduceMotion ? 0 : skill.delay,
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))]">
-              <img
-                src={skill.logoSrc}
-                alt=""
-                className="h-5 w-5"
-                loading="lazy"
-                decoding="async"
-                fetchPriority="low"
-              />
-            </span>
-            <div className="leading-tight">
-              <div className="text-sm font-semibold text-[rgb(var(--text))]">{skill.name}</div>
-              <div className="text-xs text-[rgb(var(--text-muted))]">{label}</div>
-            </div>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 export default function Home() {
   const { locale, messages } = useI18n();
   const { theme } = useTheme();
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const [contactValues, setContactValues] = useState<ContactFormValues>({
     name: "",
     email: "",
@@ -133,10 +79,37 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const key = "portfolio_welcome_seen_v1";
+    try {
+      const alreadySeen = window.localStorage.getItem(key) === "1";
+      if (alreadySeen) return;
+
+      setShowWelcome(true);
+      const timeoutId = window.setTimeout(() => {
+        try {
+          window.localStorage.setItem(key, "1");
+        } catch { }
+        setShowWelcome(false);
+      }, 9000);
+
+      return () => window.clearTimeout(timeoutId);
+    } catch {
+      setShowWelcome(true);
+    }
+  }, []);
+
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: shouldReduceMotion ? "auto" : "smooth", block: "start" });
+  };
+
+  const dismissWelcome = () => {
+    try {
+      window.localStorage.setItem("portfolio_welcome_seen_v1", "1");
+    } catch { }
+    setShowWelcome(false);
   };
 
   const onContactChange = (field: keyof ContactFormValues) => {
@@ -185,8 +158,16 @@ export default function Home() {
       ? "radial-gradient(1200px circle at 20% 10%, rgba(37,99,235,0.18), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(56,189,248,0.12), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(59,130,246,0.12), transparent 55%)"
       : "radial-gradient(1200px circle at 18% 10%, rgba(16,185,129,0.10), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(220,38,38,0.08), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(250,204,21,0.10), transparent 55%)";
 
+  const welcomeMessage =
+    locale === "fr"
+      ? "Bienvenue sur mon portfolio. Bonne visite !"
+      : "Welcome to my portfolio. Enjoy your visit!";
+  const welcomeTitle = locale === "fr" ? "Bienvenue" : "Welcome";
+
   return (
     <div className="min-h-screen bg-[rgb(var(--page-bg))] text-[rgb(var(--text))] overflow-x-hidden relative">
+
+      {/* Ambient Background */}
       <div
         className="absolute inset-0 -z-10"
         aria-hidden="true"
@@ -195,14 +176,66 @@ export default function Home() {
         }}
       />
 
+      {/* Progress Bar */}
       <motion.div
         className="fixed inset-x-0 top-0 z-60 h-1 origin-left bg-linear-to-r from-green-600 via-red-600 to-yellow-400"
         style={{ scaleX: scrollProgress }}
         aria-hidden="true"
       />
 
+      {/* Navbar */}
       <SiteNavbar variant="home" />
 
+      {showWelcome && (
+        <motion.div
+          className="pointer-events-none fixed bottom-5 left-1/2 z-60 w-[min(92vw,520px)] -translate-x-1/2 md:bottom-8 md:left-8 md:w-[min(520px,45vw)] md:translate-x-0"
+          role="status"
+          aria-live="polite"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 10, scale: 0.98 }}
+          animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0, y: 10, scale: 0.98 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: "easeOut" }}
+        >
+          <div className="pointer-events-auto flex items-end gap-3">
+            <motion.div
+              className="grid h-14 w-14 place-items-center rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/0.82)] shadow-xl shadow-black/10 backdrop-blur-xl ring-1 ring-[rgb(var(--border)/0.35)]"
+              animate={shouldReduceMotion ? undefined : { y: [0, -4, 0] }}
+              transition={{ duration: shouldReduceMotion ? 0 : 1.8, repeat: shouldReduceMotion ? 0 : Infinity, ease: "easeInOut" }}
+            >
+              <motion.span
+                className="text-3xl leading-none"
+                animate={shouldReduceMotion ? undefined : { rotate: [0, -8, 10, 0] }}
+                transition={{ duration: shouldReduceMotion ? 0 : 1.4, repeat: shouldReduceMotion ? 0 : Infinity, repeatDelay: 1.8, ease: "easeInOut" }}
+              >
+                🦊
+              </motion.span>
+            </motion.div>
+
+            <div
+              // className="relative flex-1 rounded-3xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/0.82)] px-4 py-3.5 text-[rgb(var(--text))] shadow-xl shadow-black/10 backdrop-blur-xl ring-1 ring-[rgb(var(--border)/0.35)]"
+              className="relative flex rounded-3xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/0.82)] px-4 py-3.5 text-[rgb(var(--text))] shadow-xl shadow-black/10 backdrop-blur-xl ring-1 ring-[rgb(var(--border)/0.35)]"
+            >
+              <div className="absolute -left-2.5 bottom-5 h-5 w-5 rotate-45 border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/0.82)]" />
+              <div className="flex items-start justify-between gap-5">
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold tracking-wide text-blue-600">{welcomeTitle}</div>
+                  <div className="mt-0.5 text-sm font-semibold leading-snug">{welcomeMessage}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={dismissWelcome}
+                  aria-label={locale === "fr" ? "Fermer" : "Close"}
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text-muted))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] hover:text-[rgb(var(--text))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
+                >
+                  <span className="text-base leading-none">×</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Hero */}
       <section
         id="accueil"
         className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden pt-24 lg:pt-32"
@@ -327,7 +360,7 @@ export default function Home() {
             transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
           >
             <motion.div
-              className="absolute inset-0 bg-blue-600 rounded-[2rem] rotate-3 opacity-20 blur-xl"
+              className="absolute inset-0 bg-blue-600 rounded-4xl rotate-3 opacity-20 blur-xl"
               animate={
                 shouldReduceMotion
                   ? undefined
@@ -340,7 +373,6 @@ export default function Home() {
             />
 
             <div
-              // className="relative w-full max-w-sm aspect-[4/5] bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group"
               className="relative w-full max-w-sm aspect-4/5 bg-[rgb(var(--panel-bg))] rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 group"
             >
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full bg-[rgb(var(--panel-bg)/0.92)] backdrop-blur-sm border-t border-[rgb(var(--border)/var(--border-soft))]">
@@ -379,13 +411,13 @@ export default function Home() {
               />
             </div>
 
-            {/* Badges de compétences flottants autour de la photo (effet visuel). */}
             <FloatingSkills shouldReduceMotion={!!shouldReduceMotion} label={messages.hero.floatingSkillLabel} />
           </motion.div>
 
         </div>
       </section>
 
+      {/* About */}
       <motion.section
         id="apropos"
         className="py-32 px-6 bg-[rgb(var(--panel-bg)/var(--section))]"
@@ -475,6 +507,7 @@ export default function Home() {
         </div>
       </motion.section>
 
+      {/* Projects */}
       <motion.section
         id="projets"
         className="py-32 px-6"
@@ -518,7 +551,6 @@ export default function Home() {
                   </h3>
                   <div className="flex items-center gap-2">
                     {(project.links ?? [])
-                      // .slice(0, 1)
                       .slice(0, 2)
                       .map((l) => (
                         <motion.a
@@ -589,141 +621,9 @@ export default function Home() {
         </div>
       </motion.section>
 
-      <motion.section
-        id="competences"
-        className="py-32 px-6 bg-[rgb(var(--panel-bg)/var(--section))]"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <motion.h2
-            className="text-4xl font-bold mb-16 text-center flex items-center justify-center gap-4"
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <Award className="text-blue-500" size={40} />
-            {messages.skills.title}
-          </motion.h2>
+      <SkillsSection locale={locale} messages={messages} shouldReduceMotion={!!shouldReduceMotion} />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {(Object.keys(SKILLS) as Array<keyof typeof SKILLS>).map((category, index) => (
-              <motion.div
-                key={category}
-                className="bg-[rgb(var(--panel-bg)/var(--panel))] p-8 rounded-xl border border-[rgb(var(--border)/var(--border-soft))]"
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{
-                  duration: shouldReduceMotion ? 0 : 0.6,
-                  delay: shouldReduceMotion ? 0 : index * 0.08,
-                }}
-                viewport={{ once: true }}
-                whileHover={{
-                  scale: 1.02,
-                  borderColor: "rgba(37, 99, 235, 0.5)"
-                }}
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  {category === "backend" && <Cpu className="text-blue-500" size={24} />}
-                  {category === "frontend" && <Globe className="text-blue-500" size={24} />}
-                  {category === "mobile" && <Phone className="text-blue-500" size={24} />}
-                  {category === "database" && <Database className="text-blue-500" size={24} />}
-                  {category === "tools" && <Wrench className="text-blue-500" size={24} />}
-
-                  <h3 className="text-xl font-semibold text-blue-600 capitalize">
-                    {category === "backend"
-                      ? messages.skills.backend
-                      : category === "frontend"
-                        ? messages.skills.frontend
-                        : category === "mobile"
-                          ? messages.skills.mobile
-                          : category === "database"
-                            ? messages.skills.database
-                            : messages.skills.tools}
-                  </h3>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {SKILLS[category][locale].map((skill) => (
-                    <motion.span
-                      key={skill}
-                      className="text-sm bg-blue-500/10 px-3 py-1 rounded-full text-blue-700 border border-blue-500/20"
-                      whileHover={{
-                        scale: 1.05,
-                        backgroundColor: "rgba(37, 99, 235, 0.3)",
-                        borderColor: "rgba(37, 99, 235, 0.5)"
-                      }}
-                    >
-                      {skill}
-                    </motion.span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="mt-20"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <motion.h3
-              className="text-3xl font-bold mb-12 text-center flex items-center justify-center gap-4"
-              initial={{ y: 50, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <GraduationCap className="text-blue-500" size={32} />
-              {messages.skills.educationTitle}
-            </motion.h3>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {EDUCATION.map((edu, index) => (
-                <motion.div
-                  key={edu.title.fr}
-                  className="bg-[rgb(var(--panel-bg)/var(--panel))] p-8 rounded-xl border border-[rgb(var(--border)/var(--border-soft))]"
-                  initial={{ x: index % 2 === 0 ? -50 : 50, opacity: 0 }}
-                  whileInView={{ x: 0, opacity: 1 }}
-                  transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
-                  viewport={{ once: true }}
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <h4 className="text-xl font-semibold text-blue-600 mb-3">{edu.title[locale]}</h4>
-                  <p className="text-[rgb(var(--text-muted))] mb-2 flex items-center gap-2">
-                    <Building2 size={16} />
-                    {edu.school[locale]}
-                  </p>
-                  <p className="text-sm text-[rgb(var(--text-faint))] mb-4 flex items-center gap-2">
-                    <Clock size={14} />
-                    {edu.period[locale]}
-                  </p>
-                  {Array.isArray(edu.details[locale]) ? (
-                    <ul className="grid gap-2 text-sm text-[rgb(var(--text-subtle))]">
-                      {(edu.details[locale] as string[]).map((d) => (
-                        <li key={d} className="flex gap-2">
-                          <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500/80" />
-                          <span className="leading-relaxed">{d}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-[rgb(var(--text-subtle))] text-sm leading-relaxed">
-                      {edu.details[locale] as string}
-                    </p>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </motion.section>
-
+      {/* Contact */}
       <motion.section
         id="contact"
         className="py-32 px-6"
@@ -754,7 +654,8 @@ export default function Home() {
           </motion.p>
 
           <div className="grid gap-6">
-            {/*
+            <>
+              {/*
             <motion.div
               className="rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel))] p-10"
               initial={{ scale: 0.96, opacity: 0 }}
@@ -812,6 +713,7 @@ export default function Home() {
               </div>
             </motion.div>
             */}
+            </>
 
             <motion.div
               className="rounded-2xl border border-[rgb(var(--border)/0.45)] bg-[rgb(var(--panel-bg)/0.55)] p-10"
@@ -936,7 +838,9 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
-                  <div className="min-h-[1.5rem] text-left text-sm">
+                  <div
+                    className="min-h-6 text-left text-sm"
+                  >
                     {contactStatus === "success" && (
                       <div className="inline-flex items-center gap-2 text-emerald-500">
                         <CircleCheck size={16} aria-hidden="true" />
@@ -969,8 +873,10 @@ export default function Home() {
         </div>
       </motion.section>
 
+      {/* Footer */}
       <SiteFooter />
 
+      {/* Back to Top Button */}
       <motion.button
         type="button"
         aria-label={messages.a11y.backToTop}
