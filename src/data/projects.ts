@@ -21,7 +21,8 @@ export const PROJECTS: Project[] = [
     slug: "iyvo",
     title: "IYVO",
     company: { fr: "CODEZYS", en: "CODEZYS" },
-    role: { fr: "Lead Developer", en: "Lead Developer" },
+    // role: { fr: "Lead Developer", en: "Lead Developer" },
+    role: { fr: "Full-Stack Developer", en: "Full-Stack Developer" },
     description: {
       fr: "Plateforme sans commission réunissant entreprises, ESN, consultants et experts à l’heure pour leurs missions",
       en: "Commission-free platform connecting companies, consulting firms, consultants and hourly experts for missions",
