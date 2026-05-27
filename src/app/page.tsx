@@ -160,6 +160,8 @@ export default function Home() {
       ? "radial-gradient(1200px circle at 20% 10%, rgba(37,99,235,0.18), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(56,189,248,0.12), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(59,130,246,0.12), transparent 55%)"
       : "radial-gradient(1200px circle at 18% 10%, rgba(16,185,129,0.10), transparent 60%), radial-gradient(900px circle at 90% 20%, rgba(220,38,38,0.08), transparent 55%), radial-gradient(900px circle at 50% 120%, rgba(250,204,21,0.10), transparent 55%)";
 
+  const cvUrl = process.env.NEXT_PUBLIC_CV_URL;
+
   const welcomeMessage =
     locale === "fr"
       ? "Bienvenue sur mon portfolio. Bonne visite !"
@@ -311,14 +313,17 @@ export default function Home() {
                 {messages.hero.ctaContact}
               </motion.a>
               <motion.a
-                href="#contact"
+                // href="#contact"
+                href={cvUrl ?? "#contact"}
+                target={cvUrl ? "_blank" : undefined}
+                rel={cvUrl ? "noopener noreferrer" : undefined}
                 className="px-6 py-3 bg-[rgb(var(--panel-bg)/var(--panel-soft))] hover:bg-[rgb(var(--panel-bg)/var(--panel))] text-[rgb(var(--text))] rounded-full font-semibold flex items-center gap-2 transition-all border border-[rgb(var(--border)/var(--border-soft))] text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={(e) => {
+                /* onClick={(e) => {
                   e.preventDefault();
                   scrollToSection("contact");
-                }}
+                }} */
               >
                 <Download size={18} />
                 {messages.hero.ctaCv}

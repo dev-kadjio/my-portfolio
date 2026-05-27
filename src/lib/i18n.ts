@@ -121,7 +121,8 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
       intro:
         "Passionné par la création d'applications innovantes avec plus de 4 ans d'expérience. Je transforme vos idées en solutions digitales performantes.",
       ctaContact: "Me Contacter",
-      ctaCv: "Demander mon CV",
+      // ctaCv: "Demander mon CV",
+      ctaCv: "Télécharger mon CV",
       followMe: "Suivez-moi",
       experienceBadge: "4+ ANS D'EXPÉRIENCE",
       profileCardTitle: "Développeur Full‑Stack Web & Mobile",
@@ -224,7 +225,8 @@ const MESSAGES_BY_LOCALE: Record<Locale, Messages> = {
       intro:
         "Passionate about building innovative applications with 4+ years of experience. I turn your ideas into high-performing digital solutions.",
       ctaContact: "Contact Me",
-      ctaCv: "Request my CV",
+      // ctaCv: "Request my CV",
+      ctaCv: "Download my CV",
       followMe: "Follow me",
       experienceBadge: "4+ YEARS OF EXPERIENCE",
       profileCardTitle: "Full‑Stack Web & Mobile Developer",
