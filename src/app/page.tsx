@@ -82,6 +82,7 @@ export default function Home() {
 
   useEffect(() => {
     const key = "portfolio_welcome_seen_v1";
+    console.log("");
     try {
       const alreadySeen = window.localStorage.getItem(key) === "1";
       if (alreadySeen) return;
