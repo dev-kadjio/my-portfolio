@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award, Boxes, Briefcase, Building2, Clock, Code2, Cpu, GitBranch, Globe, GraduationCap, Phone, Sparkles, TestTube2 } from "lucide-react";
+import { Award, Boxes, Briefcase, Building2, Clock, Code2, Cpu, GitBranch, Globe, GraduationCap, Smartphone, Sparkles, TestTube2 } from "lucide-react";
 import { EDUCATION, SKILLS } from "../../lib/home.constants";
 import { getSkillIconGroup } from "../../lib/skills/skillIcons";
 import { SKILL_CATEGORIES } from "../../lib/skills/skills.constants";
@@ -20,7 +20,7 @@ export function SkillsSection({
 }) {
     const skillCategoryMeta: Record<SkillCategory, { label: string; Icon: typeof Cpu }> = {
         backendServer: { label: messages.skills.backendServer, Icon: Cpu },
-        mobileDev: { label: messages.skills.mobileDev, Icon: Phone },
+        mobileDev: { label: messages.skills.mobileDev, Icon: Smartphone },
         frontendIntegration: { label: messages.skills.frontendIntegration, Icon: Globe },
         javascriptFrameworks: { label: messages.skills.javascriptFrameworks, Icon: Code2 },
         testingTools: { label: messages.skills.testingTools, Icon: TestTube2 },
