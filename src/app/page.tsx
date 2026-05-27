@@ -37,6 +37,7 @@ import {
   ArrowRight,
   Download,
   Send,
+  X,
   ChevronUp,
   Loader2,
   CircleCheck,
@@ -227,7 +228,7 @@ export default function Home() {
                   aria-label={locale === "fr" ? "Fermer" : "Close"}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl border border-[rgb(var(--border)/var(--border-soft))] bg-[rgb(var(--panel-bg)/var(--panel-soft))] text-[rgb(var(--text-muted))] transition hover:bg-[rgb(var(--panel-bg)/var(--panel))] hover:text-[rgb(var(--text))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--page-bg))]"
                 >
-                  <span className="text-base leading-none">×</span>
+                  <X size={18} aria-hidden="true" />
                 </button>
               </div>
             </div>
